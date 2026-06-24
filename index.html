@@ -1,0 +1,2010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Cricket Nijera by Arnab</title>
+<style>
+:root {
+  --bg:#2C3531; --teal:#116466; --beige:#D9B08C; --peach:#FFCB9A;
+  --mint:#D1E8E2; --dark:#1a2420; --card:#1f2e29;
+  --bd:rgba(209,232,226,0.18); --bd2:rgba(209,232,226,0.28);
+  --font:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+  --mono:ui-monospace,Consolas,monospace;
+  --green:#4caf50; --red:#ff5252; --yellow:#ffca28; --blue:#29b6f6;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--mint);font-family:var(--font);min-height:100vh;overflow-x:hidden}
+
+/* ── DOODLES ── */
+.doodle-container{position:fixed;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:0;overflow:hidden}
+.doodle-svg{position:absolute;fill:none;stroke:var(--peach);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 4px rgba(255,203,154,.4));transition:filter .3s ease}
+
+/* ── INTRO ── */
+#introScreen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;z-index:1;padding:40px 20px;text-align:center}
+.intro-title{font-size:clamp(2.6rem,8vw,5.2rem);color:var(--peach);text-shadow:3px 4px 0 rgba(0,0,0,0.4),0 0 50px rgba(255,203,154,0.5);line-height:1.1;animation:titleBounce .8s cubic-bezier(.36,.07,.19,.97) both;letter-spacing:1px}
+@keyframes titleBounce{0%{transform:scale(.7) rotate(-3deg);opacity:0}60%{transform:scale(1.08) rotate(1.5deg);opacity:1}80%{transform:scale(.96) rotate(-.5deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+@keyframes batSpin{0%{transform:rotate(-8deg) scale(1)}100%{transform:rotate(8deg) scale(1.06)}}
+.btn-play{background:var(--teal);color:var(--mint);font-size:1.6rem;padding:16px 52px;border:4px solid var(--peach);border-radius:60px;cursor:pointer;letter-spacing:1px;box-shadow:5px 6px 0 rgba(0,0,0,0.4),0 0 30px rgba(17,100,102,0.6);transition:all .18s;margin-top:8px}
+.btn-play:hover{background:#1a7a7c;transform:translate(-2px,-2px)}
+.btn-play:active{transform:translate(2px,2px)}
+
+/* ── MAIN APP ── */
+#mainApp{display:none;position:relative;z-index:1;min-height:100vh}
+#mainApp.visible{display:block}
+.app-header{background:rgba(26,36,32,0.95);backdrop-filter:blur(8px);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--bd2);position:sticky;top:0;z-index:100}
+.app-logo{font-size:1.4rem;font-weight:900;color:var(--peach);letter-spacing:1px}
+.app-logo span{color:var(--mint)}
+.date-badge{font-family:var(--mono);font-size:11px;color:var(--beige);background:rgba(17,100,102,0.2);border:1px solid var(--bd2);padding:4px 10px;border-radius:20px}
+
+/* ── TABS ── */
+.tabs-bar{display:flex;gap:6px;padding:12px 16px;overflow-x:auto;background:rgba(26,36,32,0.8);border-bottom:1px solid var(--bd);-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tabs-bar::-webkit-scrollbar{display:none}
+.tab-btn{padding:8px 16px;border-radius:30px;font-weight:bold;font-size:13px;cursor:pointer;background:rgba(17,100,102,0.12);border:1px solid var(--bd2);color:var(--beige);transition:all .2s;white-space:nowrap;flex-shrink:0}
+.tab-btn.active{background:var(--teal);border-color:var(--teal);color:var(--mint);box-shadow:0 2px 10px rgba(17,100,102,0.4)}
+
+/* ── PANELS ── */
+.panel{display:none;padding:16px;max-width:860px;margin:0 auto}
+.panel.active{display:block}
+
+/* ── BUTTONS ── */
+.btn{padding:9px 18px;border-radius:10px;font-weight:bold;font-size:13px;cursor:pointer;border:2px solid transparent;transition:all .18s;font-family:var(--font)}
+.btn-primary{background:var(--teal);color:var(--mint);border-color:var(--teal)}
+.btn-accent{background:var(--peach);color:var(--dark);border-color:var(--peach)}
+.btn-outline{background:transparent;color:var(--mint);border-color:var(--bd2)}
+.btn-danger{background:rgba(255,82,82,0.15);color:#ff7070;border-color:rgba(255,82,82,0.3)}
+.btn-sm{padding:6px 12px;font-size:12px;border-radius:8px}
+.btn-green{background:rgba(76,175,80,0.2);color:var(--green);border-color:rgba(76,175,80,0.35)}
+.btn-yellow{background:rgba(255,202,40,0.15);color:var(--yellow);border-color:rgba(255,202,40,0.3)}
+.btn:active{transform:scale(.96)}
+
+/* ── CARDS ── */
+.card{background:var(--card);border:2px solid var(--bd2);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.card-body{padding:16px}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(17,100,102,0.15);border-bottom:1px solid var(--bd)}
+.section-title{font-family:var(--mono);font-size:11px;color:var(--beige);text-transform:uppercase;letter-spacing:.1em;font-weight:bold;display:flex;align-items:center;gap:6px}
+
+/* ── PRESENCE ── */
+.presence-bar-wrap{display:flex;align-items:center;justify-content:space-between;padding:10px 0;margin-bottom:10px}
+.presence-count{font-family:var(--mono);font-size:13px;color:var(--beige)}
+.presence-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:14px}
+.player-toggle{background:var(--card);border:2px solid var(--bd);border-radius:12px;padding:10px;cursor:pointer;transition:all .2s;text-align:center;position:relative}
+.player-toggle:hover{border-color:var(--teal);transform:translateY(-1px)}
+.player-toggle.present{border-color:var(--teal);background:rgba(17,100,102,0.18);box-shadow:0 0 12px rgba(17,100,102,0.3)}
+.toggle-avatar{width:36px;height:36px;border-radius:50%;background:var(--teal);color:var(--mint);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;margin:0 auto 5px}
+.toggle-name{font-size:12px;font-weight:bold;color:var(--mint);margin-bottom:4px}
+.toggle-dot{width:8px;height:8px;border-radius:50%;background:var(--bd2);margin:4px auto 0;transition:background .2s}
+.player-toggle.present .toggle-dot{background:var(--green)}
+.chips-row{display:flex;justify-content:center;gap:3px}
+.chip{font-family:var(--mono);font-size:9px;padding:1px 4px;border-radius:4px;font-weight:bold}
+.chip-bat{background:rgba(255,203,154,0.15);color:var(--peach);border:1px solid rgba(255,203,154,0.25)}
+.chip-bowl{background:rgba(209,232,226,0.12);color:var(--mint);border:1px solid rgba(209,232,226,0.2)}
+.chip-field{background:rgba(217,176,140,0.12);color:var(--beige);border:1px solid rgba(217,176,140,0.2)}
+
+/* ── TEAMS ── */
+.teams-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+@media(max-width:480px){.teams-grid{grid-template-columns:1fr}}
+.team-card{background:var(--card);border:2px solid var(--bd2);border-radius:14px;overflow:hidden}
+.team-header{padding:10px 14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;font-weight:900;font-size:14px;color:var(--peach);border-bottom:1px solid var(--bd)}
+.team-player{display:flex;align-items:center;gap:8px;padding:7px 14px;border-bottom:1px solid rgba(209,232,226,0.04);font-size:12px}
+.team-player:last-child{border-bottom:none}
+.role-tag{font-family:var(--mono);font-size:8px;padding:2px 5px;border-radius:4px;font-weight:bold}
+.role-bat{background:rgba(255,203,154,.15);color:var(--peach);border:1px solid rgba(255,203,154,.3)}
+.role-bowl{background:rgba(209,232,226,.15);color:var(--mint);border:1px solid rgba(209,232,226,.3)}
+.role-all{background:rgba(17,100,102,.2);color:#5ecfcf;border:1px solid rgba(17,100,102,.4)}
+.role-field{background:rgba(217,176,140,.15);color:var(--beige);border:1px solid rgba(217,176,140,.3)}
+.balance-section{background:var(--card);border:2px solid var(--bd2);border-radius:14px;padding:16px;margin-bottom:14px}
+.balance-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.balance-label{font-family:var(--mono);font-size:10px;color:var(--beige);min-width:55px;text-transform:uppercase}
+.balance-bar-track{flex:1;height:10px;background:rgba(209,232,226,0.08);border-radius:5px;overflow:hidden;border:1px solid var(--bd)}
+.balance-bar-fill{height:100%;border-radius:5px 0 0 5px;background:linear-gradient(90deg,var(--teal),#1a9a9c);transition:width .8s cubic-bezier(.4,2,.6,1)}
+.balance-nums{font-family:var(--mono);font-size:9px;color:var(--beige);min-width:85px;text-align:right}
+.team-info-bar{font-family:var(--mono);font-size:10px;color:var(--beige);margin-top:4px}
+
+/* ── COIN ── */
+.coin-section{background:var(--card);border:2px solid var(--bd2);border-radius:14px;padding:18px;margin-bottom:14px;text-align:center}
+.coin-wrap{display:flex;justify-content:center;margin:14px 0 8px}
+.coin{width:100px;height:100px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffe98a,#d4a017 55%,#a07800);border:4px solid #f0c040;box-shadow:4px 5px 0 rgba(0,0,0,0.5),0 0 20px rgba(255,220,80,0.5);display:flex;align-items:center;justify-content:center;font-size:2.4rem;font-weight:bold;color:#6b4500;cursor:pointer;user-select:none;transition:transform .15s;text-shadow:1px 1px 0 rgba(255,255,255,0.3)}
+.coin:hover{transform:scale(1.05)}
+@keyframes coinFlip{0%{transform:rotateY(0)}25%{transform:rotateY(360deg) scale(1.1)}50%{transform:rotateY(720deg) scale(.95)}75%{transform:rotateY(1080deg) scale(1.05)}100%{transform:rotateY(1440deg) scale(1)}}
+.coin.flipping{animation:coinFlip 1.3s ease-in-out}
+.coin-result{font-size:1.1rem;color:var(--peach);font-weight:bold;margin-top:10px;text-shadow:0 0 12px rgba(255,203,154,0.7);animation:titleBounce .5s cubic-bezier(.36,.07,.19,.97) both}
+.coin-choice{display:flex;gap:10px;justify-content:center;margin-bottom:10px;flex-wrap:wrap}
+
+/* ── LIVE SCORING ── */
+.live-score-header{background:linear-gradient(135deg,rgba(17,100,102,0.3),rgba(44,53,49,0.5));border:2px solid var(--teal);border-radius:16px;padding:18px;margin-bottom:14px;text-align:center}
+.live-total{font-size:3rem;font-weight:900;color:var(--peach);text-shadow:0 0 30px rgba(255,203,154,0.5);font-family:var(--mono);line-height:1}
+.live-meta{font-family:var(--mono);font-size:13px;color:var(--beige);margin-top:4px}
+.live-rr{font-family:var(--mono);font-size:12px;color:var(--mint);margin-top:3px}
+.batting-strip{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.bat-card{background:var(--card);border:2px solid var(--bd2);border-radius:12px;padding:12px;position:relative}
+.bat-card.on-strike{border-color:var(--peach);box-shadow:0 0 12px rgba(255,203,154,0.25)}
+.striker-badge{position:absolute;top:-8px;left:12px;background:var(--peach);color:var(--dark);font-size:9px;font-weight:900;padding:2px 7px;border-radius:10px;letter-spacing:.05em}
+.bat-name{font-weight:bold;font-size:14px;color:var(--mint);margin-bottom:4px}
+.bat-score{font-family:var(--mono);font-size:1.5rem;font-weight:900;color:var(--peach)}
+.bat-balls{font-family:var(--mono);font-size:11px;color:var(--beige)}
+.bat-sr{font-family:var(--mono);font-size:10px;color:var(--beige)}
+.bat-extras{font-family:var(--mono);font-size:9px;color:var(--mint);margin-top:2px}
+.bowler-strip{background:var(--card);border:2px solid var(--bd2);border-radius:12px;padding:12px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.bowler-info{display:flex;flex-direction:column}
+.bowler-label{font-family:var(--mono);font-size:9px;color:var(--beige);text-transform:uppercase;letter-spacing:.08em}
+.bowler-name{font-weight:bold;font-size:15px;color:var(--mint)}
+.bowler-stats{font-family:var(--mono);font-size:12px;color:var(--peach)}
+.over-balls{display:flex;gap:5px;flex-wrap:wrap}
+.ball-dot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:bold;font-family:var(--mono)}
+.ball-0{background:rgba(209,232,226,0.08);color:var(--beige);border:1px solid var(--bd)}
+.ball-4{background:rgba(255,203,154,0.2);color:var(--peach);border:1px solid rgba(255,203,154,0.3)}
+.ball-6{background:rgba(76,175,80,0.2);color:var(--green);border:1px solid rgba(76,175,80,0.3)}
+.ball-W{background:rgba(255,82,82,0.2);color:#ff7070;border:1px solid rgba(255,82,82,0.3)}
+.ball-WD{background:rgba(41,182,246,0.2);color:var(--blue);border:1px solid rgba(41,182,246,0.3)}
+.ball-NB{background:rgba(255,202,40,0.2);color:var(--yellow);border:1px solid rgba(255,202,40,0.3)}
+
+/* ── SCORE BUTTONS ── */
+.score-btns{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.score-btn{padding:14px 8px;border-radius:12px;font-size:1rem;font-weight:900;cursor:pointer;border:2px solid;transition:all .15s;font-family:var(--mono);text-align:center}
+.score-btn:active{transform:scale(.92)}
+.sb-run{background:rgba(17,100,102,0.25);color:var(--mint);border-color:var(--teal)}
+.sb-4{background:rgba(255,203,154,0.2);color:var(--peach);border-color:rgba(255,203,154,0.4)}
+.sb-6{background:rgba(76,175,80,0.2);color:var(--green);border-color:rgba(76,175,80,0.4)}
+.sb-wd{background:rgba(41,182,246,0.2);color:var(--blue);border-color:rgba(41,182,246,0.4)}
+.sb-nb{background:rgba(255,202,40,0.15);color:var(--yellow);border-color:rgba(255,202,40,0.35)}
+.sb-nbf{background:rgba(255,152,0,0.15);color:#ff9800;border-color:rgba(255,152,0,0.35)}
+.sb-w{background:rgba(255,82,82,0.2);color:#ff5252;border-color:rgba(255,82,82,0.4);font-size:1.1rem}
+.sb-dot{background:rgba(209,232,226,0.08);color:var(--beige);border-color:var(--bd2)}
+
+/* ── WICKET MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal-overlay.hidden{display:none}
+.modal{background:var(--card);border:2px solid var(--bd2);border-radius:18px;padding:22px;max-width:420px;width:100%;max-height:90vh;overflow-y:auto}
+.modal h3{color:var(--peach);font-size:1.1rem;margin-bottom:14px}
+.modal-field{margin-bottom:12px}
+.modal-label{font-family:var(--mono);font-size:10px;color:var(--beige);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;display:block}
+.modal-select{width:100%;background:rgba(17,100,102,0.15);border:1px solid var(--bd2);border-radius:8px;padding:9px 12px;color:var(--mint);font-family:var(--font);font-size:14px;outline:none}
+.modal-select option{background:#1a2420}
+.modal-row{display:flex;gap:8px;margin-top:14px}
+
+/* ── SELECT PLAYER MODAL ── */
+.sel-modal{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.sel-modal.hidden{display:none}
+.sel-box{background:var(--card);border:2px solid var(--bd2);border-radius:16px;padding:18px;max-width:360px;width:100%;max-height:80vh;display:flex;flex-direction:column}
+.sel-box h3{color:var(--peach);font-size:1rem;margin-bottom:12px}
+.sel-list{overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:6px}
+.sel-item{padding:10px 14px;background:rgba(17,100,102,0.12);border:1px solid var(--bd);border-radius:8px;cursor:pointer;font-weight:bold;font-size:14px;color:var(--mint);transition:all .15s;display:flex;justify-content:space-between;align-items:center}
+.sel-item:hover{background:rgba(17,100,102,0.3);border-color:var(--teal)}
+.sel-item-stats{font-family:var(--mono);font-size:10px;color:var(--beige)}
+
+/* ── NOT BATTED / BOWLED ── */
+.pool-section{background:var(--card);border:2px solid var(--bd2);border-radius:12px;padding:14px;margin-bottom:14px}
+.pool-title{font-family:var(--mono);font-size:10px;color:var(--beige);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.pool-list{display:flex;flex-wrap:wrap;gap:6px}
+.pool-pill{background:rgba(17,100,102,0.15);border:1px solid var(--bd);border-radius:20px;padding:4px 11px;font-size:12px;font-weight:bold;color:var(--mint);font-family:var(--mono)}
+.pool-empty{color:rgba(209,232,226,0.3);font-size:12px;font-style:italic}
+
+/* ── HISTORY ── */
+.history-card{background:var(--card);border:2px solid var(--bd2);border-radius:14px;overflow:hidden;margin-bottom:12px}
+.history-card-header{padding:12px 16px;background:rgba(17,100,102,0.15);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;cursor:pointer}
+.history-date{font-family:var(--mono);font-size:11px;color:var(--beige)}
+.history-result{font-size:.95rem}
+.result-win{color:var(--mint)}
+.result-loss{color:#ff7070}
+.result-draw{color:var(--peach)}
+.history-scores{font-family:var(--mono);font-size:13px;color:var(--mint);padding:8px 16px}
+.history-detail{display:none;padding:0 16px 14px}
+.history-detail.open{display:block}
+.history-stat-row{display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(209,232,226,0.06);font-size:12px}
+.history-stat-row:last-child{border-bottom:none}
+.search-input{width:100%;background:rgba(17,100,102,0.12);border:1px solid var(--bd2);border-radius:10px;padding:10px 14px;color:var(--mint);font-family:var(--font);font-size:14px;outline:none;margin-bottom:14px;transition:border-color .2s}
+.search-input:focus{border-color:var(--teal)}
+
+/* ── BEST PERFORMERS ── */
+.performer-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:14px}
+.performer-card{background:var(--card);border:2px solid var(--bd2);border-radius:12px;padding:14px}
+.performer-label{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--beige);margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.performer-name{font-size:1.1rem;font-weight:900;color:var(--peach);margin-bottom:2px}
+.performer-stat{font-family:var(--mono);font-size:12px;color:var(--mint)}
+.performer-date{font-family:var(--mono);font-size:9px;color:var(--beige);margin-top:3px}
+.performers-filter{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+
+/* ── RATINGS ── */
+.rating-editor{background:var(--card);border:2px solid var(--bd2);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.rating-col-header{display:grid;grid-template-columns:120px 70px 70px 70px 30px;gap:5px;padding:8px 14px;background:rgba(17,100,102,0.15);border-bottom:1px solid var(--bd)}
+.rating-col-header span{font-family:var(--mono);font-size:10px;color:var(--beige);text-transform:uppercase;letter-spacing:.08em}
+.rating-row{display:grid;grid-template-columns:120px 70px 70px 70px 30px;gap:5px;align-items:center;padding:8px 14px;border-bottom:1px solid rgba(209,232,226,0.05);transition:background .15s}
+.rating-row:hover{background:rgba(17,100,102,0.07)}
+.rating-row:last-child{border-bottom:none}
+.rating-row .pname{font-size:13px;font-weight:bold;color:var(--mint)}
+.rating-cell{display:flex;flex-direction:column;gap:2px;align-items:center}
+.mini-bar{height:2px;border-radius:1px;width:100%}
+.rating-input{background:rgba(17,100,102,0.15);border:1px solid var(--bd2);border-radius:6px;padding:5px 7px;color:var(--mint);font-family:var(--mono);font-size:12px;outline:none;width:100%;text-align:center;transition:border-color .2s}
+.rating-input:focus{border-color:var(--teal)}
+
+/* ── COMMENTS ── */
+.comment-input-row{display:flex;gap:8px;margin-bottom:12px}
+.comment-input{flex:1;background:rgba(17,100,102,0.12);border:1px solid var(--bd2);border-radius:8px;padding:9px 12px;color:var(--mint);font-family:var(--font);font-size:13px;outline:none;resize:none}
+.comment-input:focus{border-color:var(--teal)}
+.comment-card{background:rgba(17,100,102,0.08);border:1px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:8px}
+.comment-author{font-weight:bold;font-size:12px;color:var(--peach);margin-bottom:3px}
+.comment-text{font-size:13px;color:var(--mint);line-height:1.5}
+.comment-time{font-family:var(--mono);font-size:10px;color:var(--beige);margin-top:4px}
+.comment-name-input{width:100%;background:rgba(17,100,102,0.12);border:1px solid var(--bd2);border-radius:8px;padding:8px 12px;color:var(--mint);font-family:var(--font);font-size:13px;outline:none;margin-bottom:8px}
+.comment-name-input:focus{border-color:var(--teal)}
+
+/* ── POSTS ── */
+.posts-match-header{background:linear-gradient(135deg,rgba(17,100,102,0.3),rgba(26,36,32,0.5));border:2px solid var(--teal);border-radius:14px;padding:16px;margin-bottom:14px}
+.live-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,82,82,0.2);border:1px solid #ff5252;border-radius:20px;padding:3px 10px;font-family:var(--mono);font-size:10px;color:#ff7070;font-weight:bold;letter-spacing:.08em}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#ff5252;animation:livePulse 1.2s infinite}
+@keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+.post-card{background:var(--card);border:2px solid var(--bd2);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.post-media{width:100%;max-height:320px;object-fit:cover;display:block}
+.post-video{width:100%;border-radius:0;display:block}
+.post-actions{padding:12px 16px;display:flex;align-items:center;gap:14px;border-top:1px solid var(--bd)}
+.post-like-btn{display:flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;color:var(--beige);font-family:var(--font);font-size:13px;padding:5px 0;transition:color .2s}
+.post-like-btn:hover,.post-like-btn.liked{color:#ff7070}
+.post-like-btn.liked .heart{filter:none}
+.post-comment-btn{display:flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;color:var(--beige);font-family:var(--font);font-size:13px;padding:5px 0;transition:color .2s}
+.post-comment-btn:hover{color:var(--mint)}
+.post-body{padding:12px 16px}
+.post-author{font-weight:bold;font-size:13px;color:var(--peach);margin-bottom:3px}
+.post-caption{font-size:13px;color:var(--mint);line-height:1.5}
+.post-timestamp{font-family:var(--mono);font-size:10px;color:var(--beige);margin-top:4px}
+.post-comments-section{padding:0 16px 12px;border-top:1px solid var(--bd)}
+.post-comment-item{padding:6px 0;border-bottom:1px solid rgba(209,232,226,0.05);font-size:12px}
+.post-comment-item:last-child{border-bottom:none}
+.post-comment-author{font-weight:bold;color:var(--peach);margin-right:5px}
+.upload-zone{border:2px dashed var(--bd2);border-radius:12px;padding:28px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:12px;position:relative}
+.upload-zone:hover{border-color:var(--teal);background:rgba(17,100,102,0.08)}
+.upload-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-icon{font-size:2rem;margin-bottom:8px}
+.upload-text{font-size:13px;color:var(--beige)}
+
+/* ── STREAM ── */
+.stream-section{background:var(--card);border:2px solid var(--bd2);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.stream-video{width:100%;display:block;background:#000;min-height:200px}
+.stream-controls{padding:12px 16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.stream-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,82,82,0.15);border:1px solid rgba(255,82,82,0.35);border-radius:20px;padding:4px 12px;font-family:var(--mono);font-size:11px;color:#ff7070;font-weight:bold}
+.viewer-count{font-family:var(--mono);font-size:11px;color:var(--beige);margin-left:auto}
+
+/* ── ENTRY GRID ── */
+.entry-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:12px}
+.entry-row{display:flex;flex-direction:column;gap:4px}
+.entry-row label{font-family:var(--mono);font-size:10px;color:var(--beige);letter-spacing:.1em;text-transform:uppercase}
+.entry-row input,.entry-row select{background:rgba(17,100,102,0.15);border:1px solid var(--bd2);border-radius:8px;padding:7px 10px;color:var(--mint);font-family:var(--font);font-size:13px;outline:none;transition:border-color .2s}
+.entry-row input:focus,.entry-row select:focus{border-color:var(--teal)}
+.entry-row select option{background:#1a2420}
+
+/* ── INNINGS TABS ── */
+.innings-tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.innings-tab{padding:7px 16px;border-radius:30px;font-weight:bold;font-size:13px;cursor:pointer;background:rgba(17,100,102,0.12);border:1px solid var(--bd2);color:var(--beige);transition:all .2s}
+.innings-tab.active{background:var(--teal);border-color:var(--teal);color:var(--mint);box-shadow:0 2px 10px rgba(17,100,102,0.4)}
+
+/* ── ADD PLAYER ── */
+.add-player-row{display:flex;gap:10px}
+.add-player-input{flex:1;background:rgba(17,100,102,0.15);border:1px solid var(--bd2);border-radius:8px;padding:8px 12px;color:var(--mint);font-family:var(--font);font-size:13px;outline:none}
+.add-player-input:focus{border-color:var(--teal)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:70px;right:20px;background:var(--teal);color:var(--mint);border:2px solid var(--peach);box-shadow:4px 5px 0 rgba(0,0,0,0.4);padding:10px 18px;border-radius:30px;font-size:14px;font-weight:bold;z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.4,2,.6,1);pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* ── FOOTER ── */
+footer{padding:24px;text-align:center;border-top:1px solid var(--bd);margin-top:20px}
+.footer-text{font-family:var(--mono);font-size:11px;color:var(--beige);line-height:1.8}
+.hl{color:var(--peach)}
+
+/* ── UNDO BTN ── */
+.undo-btn{display:flex;align-items:center;gap:6px;background:rgba(217,176,140,0.12);border:1px solid rgba(217,176,140,0.25);border-radius:8px;padding:6px 12px;color:var(--beige);font-size:12px;cursor:pointer;font-family:var(--font)}
+.undo-btn:hover{background:rgba(217,176,140,0.22);color:var(--mint)}
+
+/* === Glowing doodles & polish === */
+@keyframes doodleGlow {
+  0%,100% { filter: drop-shadow(0 0 6px rgba(255,203,154,0.7)) drop-shadow(0 0 14px rgba(255,203,154,0.45)); opacity: 0.5; }
+  50%     { filter: drop-shadow(0 0 16px rgba(255,203,154,1)) drop-shadow(0 0 32px rgba(255,203,154,0.85)); opacity: 0.9; }
+}
+.doodle-svg { animation: doodleGlow 4.5s ease-in-out infinite; }
+.doodle-svg:nth-child(3n)   { animation-duration: 6s; stroke: var(--mint); filter: drop-shadow(0 0 10px rgba(209,232,226,0.8)); }
+.doodle-svg:nth-child(4n+1) { animation-duration: 7s; stroke: var(--beige); }
+.doodle-svg:nth-child(2n)   { animation-delay: -2s; }
+.doodle-svg:nth-child(5n)   { animation-delay: -3.5s; }
+
+.player-toggle.present {
+  box-shadow: 0 0 0 2px var(--peach), 0 0 18px rgba(255,203,154,0.7), 0 0 36px rgba(255,203,154,0.45) !important;
+  animation: selPulse 1.8s ease-in-out infinite;
+}
+@keyframes selPulse {
+  0%,100% { box-shadow: 0 0 0 2px var(--peach), 0 0 14px rgba(255,203,154,0.55), 0 0 26px rgba(255,203,154,0.3); }
+  50%     { box-shadow: 0 0 0 2px var(--peach), 0 0 24px rgba(255,203,154,0.95), 0 0 48px rgba(255,203,154,0.6); }
+}
+
+.btn-play { animation: playGlow 2.2s ease-in-out infinite; }
+@keyframes playGlow {
+  0%,100% { box-shadow: 5px 6px 0 rgba(0,0,0,0.4), 0 0 24px rgba(255,203,154,0.55), 0 0 48px rgba(17,100,102,0.5); }
+  50%     { box-shadow: 5px 6px 0 rgba(0,0,0,0.4), 0 0 40px rgba(255,203,154,0.95), 0 0 80px rgba(17,100,102,0.85); }
+}
+
+</style>
+</head>
+<body>
+
+<!-- DOODLES -->
+<div class="doodle-container" id="doodleContainer"></div>
+<div class="toast" id="appToast"></div>
+
+<!-- MODALS -->
+<div class="modal-overlay hidden" id="wicketModal">
+  <div class="modal">
+    <h3>🎯 Wicket!</h3>
+    <div class="modal-field">
+      <label class="modal-label">Batsman Out</label>
+      <select id="wkt-batsman" class="modal-select"></select>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Bowler</label>
+      <select id="wkt-bowler" class="modal-select"></select>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Dismissal Type</label>
+      <select id="wkt-type" class="modal-select">
+        <option>Bowled</option>
+        <option>Caught</option>
+        <option>LBW</option>
+        <option>Run Out</option>
+        <option>Stumped</option>
+        <option>Hit Wicket</option>
+        <option>Handled Ball</option>
+        <option>Obstructed Field</option>
+        <option>Timed Out</option>
+      </select>
+    </div>
+    <div class="modal-field" id="wkt-catcher-row" style="display:none">
+      <label class="modal-label">Caught By (optional)</label>
+      <select id="wkt-catcher" class="modal-select"></select>
+    </div>
+    <div class="modal-row">
+      <button class="btn btn-danger" style="flex:1" onclick="cancelWicket()">Cancel</button>
+      <button class="btn btn-accent" style="flex:1" onclick="confirmWicket()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="sel-modal hidden" id="selModal">
+  <div class="sel-box">
+    <h3 id="selModalTitle">Select Player</h3>
+    <div class="sel-list" id="selList"></div>
+    <button class="btn btn-outline btn-sm" style="margin-top:10px" onclick="closeSelModal()">Cancel</button>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="postCommentModal">
+  <div class="modal">
+    <h3>💬 Comment</h3>
+    <input class="comment-name-input" id="postCommentAuthor" placeholder="Your name..." />
+    <textarea class="comment-input" id="postCommentText" rows="3" placeholder="Write a comment..."></textarea>
+    <div class="modal-row">
+      <button class="btn btn-outline" style="flex:1" onclick="document.getElementById('postCommentModal').classList.add('hidden')">Cancel</button>
+      <button class="btn btn-accent" style="flex:1" onclick="submitPostComment()">Post</button>
+    </div>
+  </div>
+</div>
+
+<!-- INTRO -->
+<div id="introScreen">
+  <div class="doodle-container" id="doodleContainerIntro"></div>
+  <h1 class="intro-title">Cricket Nijera</h1>
+  <p style="font-size:1.4rem;color:var(--mint);margin-top:6px;letter-spacing:1px;text-shadow:1px 2px 0 rgba(0,0,0,0.3)">by Arnab</p>
+  <div style="font-size:80px;margin:22px 0 16px;animation:batSpin 2.2s ease-in-out infinite alternate;display:block;filter:drop-shadow(0 8px 22px rgba(0,0,0,0.5))">🏏</div>
+  <p style="font-weight:bold;font-size:1rem;color:var(--beige);margin-bottom:26px;letter-spacing:.5px">Live Scoring · Teams · Posts · Streaming</p>
+  <button class="btn-play" onclick="startApp()">Let's Play!</button>
+  <div style="margin-top:24px;font-family:var(--mono);font-size:11px;color:var(--beige);opacity:.7" id="dateBadge"></div>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp">
+  <div class="doodle-container" id="doodleContainerMain"></div>
+
+  <header class="app-header">
+    <div class="app-logo">Cricket <span>Nijera</span></div>
+    <div class="date-badge" id="dateBadge2"></div>
+  </header>
+
+  <nav class="tabs-bar">
+    <button class="tab-btn active" onclick="switchTab('presence',this)">📋 Squad</button>
+    <button class="tab-btn" onclick="switchTab('teams',this)">⚖️ Teams</button>
+    <button class="tab-btn" onclick="switchTab('live',this)">🟢 Live Score</button>
+    <button class="tab-btn" onclick="switchTab('history',this)">📜 History</button>
+    <button class="tab-btn" onclick="switchTab('performers',this)">🏆 Best</button>
+    <button class="tab-btn" onclick="switchTab('posts',this)">📸 Posts</button>
+    <button class="tab-btn" onclick="switchTab('ratings',this)">⭐ Ratings</button>
+  </nav>
+
+  <!-- PRESENCE -->
+  <div class="panel active" id="panel-presence">
+    <div class="presence-bar-wrap">
+      <div class="presence-count"><span id="presentCount">0</span> / <span id="totalCount">0</span> players today</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary btn-sm" onclick="selectAll()">All</button>
+        <button class="btn btn-outline btn-sm" onclick="selectNone()">None</button>
+      </div>
+    </div>
+    <div class="presence-grid" id="presenceGrid"></div>
+    <div class="card">
+      <div class="card-body">
+        <div class="section-title" style="margin-bottom:10px">Add New Player</div>
+        <div class="add-player-row">
+          <input id="newPlayerName" class="add-player-input" type="text" placeholder="Player name..." onkeydown="if(event.key==='Enter')addPlayer()" />
+          <button class="btn btn-accent" onclick="addPlayer()">Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEAMS -->
+  <div class="panel" id="panel-teams">
+    <div class="coin-section">
+      <div class="section-title" style="justify-content:center;margin-bottom:10px">Toss the Coin</div>
+      <div class="coin-choice">
+        <span style="font-size:11px;color:var(--beige);align-self:center">Team A calls:</span>
+        <button id="chooseHeads" class="btn btn-accent btn-sm" onclick="chooseSide('heads')">Heads</button>
+        <button id="chooseTails" class="btn btn-outline btn-sm" onclick="chooseSide('tails')">Tails</button>
+      </div>
+      <div class="coin-wrap"><div class="coin" id="coin" onclick="tossCoin()">H</div></div>
+      <div style="font-size:11px;color:var(--beige)">Click to toss!</div>
+      <div id="coinResult"></div>
+    </div>
+    <button class="btn btn-accent" style="width:100%;font-size:16px;padding:14px;margin-bottom:14px" onclick="generateTeams()" id="genBtn">Generate Balanced Teams</button>
+    <div id="teamsOutput"></div>
+  </div>
+
+  <!-- LIVE SCORE -->
+  <div class="panel" id="panel-live">
+    <!-- match setup -->
+    <div class="card" id="liveSetupCard" style="margin-bottom:14px">
+      <div class="card-header"><span class="section-title">Match Setup</span></div>
+      <div class="card-body">
+        <div class="entry-grid">
+          <div class="entry-row"><label>Date</label><input type="date" id="liveDate" /></div>
+          <div class="entry-row"><label>Overs</label><input type="number" id="liveOvers" placeholder="20" min="1" /></div>
+          <div class="entry-row"><label>Batting Team</label>
+            <select id="liveBattingTeam">
+              <option value="">Select...</option>
+              <option>Team A</option>
+              <option>Team B</option>
+            </select>
+          </div>
+        </div>
+        <div class="innings-tabs">
+          <button class="innings-tab active" onclick="switchLiveInnings(0,this)">1st Innings</button>
+          <button class="innings-tab" onclick="switchLiveInnings(1,this)">2nd Innings</button>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-accent" style="flex:1" onclick="resetLiveInnings()">Start / Reset Innings</button>
+          <button class="btn btn-outline" onclick="saveMatchFromLive()">💾 Save Match</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIVE DISPLAY -->
+    <div class="live-score-header" id="liveScoreDisplay">
+      <div class="live-total" id="liveTotalDisp">0/0</div>
+      <div class="live-meta" id="liveMetaDisp">0.0 overs · 0 needed</div>
+      <div class="live-rr" id="liveRRDisp">RR: 0.00</div>
+    </div>
+
+    <!-- BATTING STRIP -->
+    <div class="batting-strip">
+      <div class="bat-card on-strike" id="bat1Card">
+        <span class="striker-badge">STRIKER</span>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div class="bat-name" id="bat1Name">—</div>
+            <div class="bat-score" id="bat1Score">0</div>
+            <div class="bat-balls" id="bat1Balls">(0b)</div>
+            <div class="bat-sr" id="bat1SR">SR: —</div>
+            <div class="bat-extras" id="bat1Extras"></div>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="openSelModal('bat1')" style="font-size:10px">Change</button>
+        </div>
+      </div>
+      <div class="bat-card" id="bat2Card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div class="bat-name" id="bat2Name">—</div>
+            <div class="bat-score" id="bat2Score">0</div>
+            <div class="bat-balls" id="bat2Balls">(0b)</div>
+            <div class="bat-sr" id="bat2SR">SR: —</div>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="openSelModal('bat2')" style="font-size:10px">Change</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOWLER STRIP -->
+    <div class="bowler-strip">
+      <div class="bowler-info">
+        <span class="bowler-label">Bowling</span>
+        <span class="bowler-name" id="bowlerName">— Select —</span>
+        <span class="bowler-stats" id="bowlerStats">0-0 (0.0)</span>
+      </div>
+      <div>
+        <div class="over-balls" id="overBalls"></div>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="openSelModal('bowler')">Change</button>
+    </div>
+
+    <!-- SCORE BUTTONS -->
+    <div class="score-btns">
+      <button class="score-btn sb-dot" onclick="addBall('dot')">• <br><span style="font-size:10px">Dot</span></button>
+      <button class="score-btn sb-run" onclick="addBall(1)">1</button>
+      <button class="score-btn sb-run" onclick="addBall(2)">2</button>
+      <button class="score-btn sb-run" onclick="addBall(3)">3</button>
+      <button class="score-btn sb-run" onclick="addBall(4)" style="font-size:1.3rem">4</button>
+      <button class="score-btn sb-run" onclick="addBall(5)">5</button>
+      <button class="score-btn sb-6" onclick="addBall(6)" style="font-size:1.3rem">6</button>
+      <button class="score-btn sb-wd" onclick="addBall('wd')">WD</button>
+      <button class="score-btn sb-nb" onclick="addBall('nb')">NB<br><span style="font-size:9px">+1 run</span></button>
+      <button class="score-btn sb-nbf" onclick="addBall('nbf')">NB<br><span style="font-size:9px">Fast</span></button>
+      <div></div>
+      <button class="score-btn sb-w" onclick="openWicketModal()">🎯<br><span style="font-size:10px">Wicket</span></button>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <button class="undo-btn" onclick="undoLastBall()">↩ Undo</button>
+      <button class="btn btn-outline btn-sm" onclick="swapStrike()">⇄ Swap Strike</button>
+    </div>
+
+    <!-- NOT BATTED -->
+    <div class="pool-section">
+      <div class="pool-title">🏏 Yet to Bat</div>
+      <div class="pool-list" id="yetToBat"></div>
+    </div>
+
+    <!-- NOT BOWLED -->
+    <div class="pool-section">
+      <div class="pool-title">⚡ Yet to Bowl</div>
+      <div class="pool-list" id="yetToBowl"></div>
+    </div>
+
+    <!-- BATTING SCORECARD -->
+    <div class="card" style="margin-top:14px">
+      <div class="card-header"><span class="section-title">Batting Scorecard</span></div>
+      <div id="liveBattingCard" style="overflow-x:auto"></div>
+    </div>
+
+    <!-- BOWLING FIGURES -->
+    <div class="card">
+      <div class="card-header"><span class="section-title">Bowling Figures</span></div>
+      <div id="liveBowlingCard" style="overflow-x:auto"></div>
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="panel" id="panel-history">
+    <input class="search-input" type="text" placeholder="Search history..." oninput="renderHistory(this.value)" />
+    <div id="historyList"></div>
+  </div>
+
+  <!-- BEST PERFORMERS -->
+  <div class="panel" id="panel-performers">
+    <div class="performers-filter">
+      <button class="btn btn-accent btn-sm" onclick="renderPerformers('all')">All Time</button>
+      <button class="btn btn-outline btn-sm" onclick="renderPerformers('match')">Latest Match</button>
+      <button class="btn btn-outline btn-sm" onclick="renderPerformers('month')">This Month</button>
+    </div>
+    <div id="performerGrid"></div>
+    <div id="performerHistory"></div>
+  </div>
+
+  <!-- POSTS -->
+  <div class="panel" id="panel-posts">
+    <!-- current match banner -->
+    <div id="postsMatchBanner"></div>
+
+    <!-- live stream section -->
+    <div class="stream-section">
+      <div class="card-header">
+        <span class="section-title">📡 Live Stream</span>
+        <span class="stream-badge" id="streamStatusBadge" style="display:none">
+          <span class="live-dot"></span>LIVE
+        </span>
+      </div>
+      <video id="streamVideo" class="stream-video" autoplay muted playsinline style="display:none"></video>
+      <video id="watchVideo" class="stream-video" autoplay playsinline style="display:none"></video>
+      <div style="padding:16px;text-align:center;color:var(--beige);font-size:13px" id="streamPlaceholder">No active stream</div>
+      <div class="stream-controls">
+        <button class="btn btn-danger btn-sm" onclick="startBroadcast()" id="broadcastBtn">🔴 Go Live</button>
+        <button class="btn btn-outline btn-sm" onclick="stopBroadcast()" id="stopBroadcastBtn" style="display:none">⏹ Stop</button>
+        <button class="btn btn-primary btn-sm" onclick="watchStream()" id="watchBtn">👁 Watch</button>
+        <span class="viewer-count" id="viewerCount"></span>
+      </div>
+    </div>
+
+    <!-- create post -->
+    <div class="card">
+      <div class="card-header"><span class="section-title">📸 New Post</span></div>
+      <div class="card-body">
+        <input class="comment-name-input" id="postAuthor" placeholder="Your name..." />
+        <label style="display:block;font-size:11px;color:var(--beige);margin:8px 0 4px;font-family:var(--mono)">📌 Which match is this post for?</label>
+        <select id="postMatchSelect" class="comment-name-input" style="margin-bottom:8px"></select>
+        <textarea class="comment-input" id="postCaption" rows="2" placeholder="Caption..." style="width:100%;margin-bottom:10px"></textarea>
+        <div class="upload-zone" id="uploadZone">
+          <input type="file" id="postMediaInput" accept="image/*,video/*" onchange="handlePostMedia(event)" />
+          <div class="upload-icon">📎</div>
+          <div class="upload-text">Tap to upload photo or video</div>
+        </div>
+        <div id="mediaPreview" style="margin-bottom:10px"></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary btn-sm" onclick="openCamera()" style="flex:1">📷 Camera</button>
+          <button class="btn btn-accent" onclick="submitPost()" style="flex:1">Post</button>
+        </div>
+        <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="handlePostMedia(event)" />
+      </div>
+    </div>
+
+    <!-- feed -->
+    <div id="postsFeed"></div>
+  </div>
+
+  <!-- RATINGS -->
+  <div class="panel" id="panel-ratings">
+    <div class="rating-editor" id="ratingsEditor"></div>
+    <div class="card">
+      <div class="card-body">
+        <div class="section-title" style="margin-bottom:10px">Add New Player</div>
+        <div class="add-player-row">
+          <input id="newPlayerName2" class="add-player-input" type="text" placeholder="Player name..." onkeydown="if(event.key==='Enter')addPlayer2()" />
+          <button class="btn btn-accent" onclick="addPlayer2()">Add</button>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <button class="btn btn-accent" style="flex:1" onclick="saveRatings()">💾 Save Ratings</button>
+      <button class="btn btn-outline" onclick="resetRatings()">Reset</button>
+    </div>
+    <!-- comments on ratings page -->
+    <div class="card">
+      <div class="card-header"><span class="section-title">💬 Comments</span></div>
+      <div class="card-body">
+        <input class="comment-name-input" id="commentAuthorName" placeholder="Your name..." />
+        <div class="comment-input-row">
+          <textarea class="comment-input" id="commentText" rows="2" placeholder="Leave a comment..."></textarea>
+          <button class="btn btn-accent btn-sm" onclick="addComment()" style="align-self:flex-end">Post</button>
+        </div>
+        <div id="commentsSection"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-text">
+      <span class="hl">Cricket Nijera</span> · Developed by <span class="hl">Arnab Mallick</span><br>
+      <span style="color:var(--bd2);font-size:10px">© 2025 · Live match scoring for real cricket</span>
+    </div>
+  </footer>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+import { getFirestore, setDoc, getDoc, doc, onSnapshot, collection, addDoc, serverTimestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA_y3KQK3okLXPs3f5rG_WUGSZ6PAKAtYE",
+  authDomain: "cricket-nijera.firebaseapp.com",
+  projectId: "cricket-nijera",
+  storageBucket: "cricket-nijera.firebasestorage.app",
+  messagingSenderId: "552641377359",
+  appId: "1:552641377359:web:6e3392e0702f385776663a"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+
+const CLOUDINARY_CLOUD_NAME="dt3u2pht1";
+const CLOUDINARY_UPLOAD_PRESET="cricket-nijera";
+async function uploadToCloudinary(file){
+ const fd=new FormData();
+ fd.append("file",file);
+ fd.append("upload_preset",CLOUDINARY_UPLOAD_PRESET);
+ const r=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`,{method:"POST",body:fd});
+ if(!r.ok) throw new Error("Cloudinary upload failed");
+ const d=await r.json();
+ return d.secure_url;
+}
+/* ── DEFAULT PLAYERS ── */
+const DEFAULT_PLAYERS = [
+  {name:"Ritish",    bat:95,  bowl:90,  fielding:100},
+  {name:"Rit",       bat:90,  bowl:80,  fielding:90},
+  {name:"Ranit",     bat:85,  bowl:85,  fielding:88},
+  {name:"Swaraj",    bat:70,  bowl:75,  fielding:70},
+  {name:"Brevis",    bat:70,  bowl:65,  fielding:70},
+  {name:"Gourab",    bat:60,  bowl:75,  fielding:65},
+  {name:"Priya",     bat:85,  bowl:70,  fielding:75},
+  {name:"Macro",     bat:65,  bowl:60,  fielding:70},
+  {name:"Debankush", bat:70,  bowl:65,  fielding:80},
+  {name:"Smarta",    bat:65,  bowl:65,  fielding:65},
+  {name:"Mota",      bat:65,  bowl:65,  fielding:75},
+  {name:"Boro",      bat:75,  bowl:80,  fielding:82},
+  {name:"Angshu",    bat:55,  bowl:60,  fielding:55},
+  {name:"Krish",     bat:70,  bowl:65,  fielding:70},
+  {name:"Arnab",     bat:60,  bowl:65,  fielding:55},
+  {name:"Koushik",   bat:60,  bowl:65,  fielding:75},
+  {name:"Subasis",   bat:60,  bowl:60,  fielding:70},
+  {name:"Surojit",   bat:40,  bowl:65,  fielding:70},
+  {name:"Subhadip",  bat:70,  bowl:70,  fielding:70},
+  {name:"Kushal",    bat:65,  bowl:65,  fielding:85},
+];
+
+/* ── STATE ── */
+let players   = JSON.parse(localStorage.getItem("squadPlayers_v4") || "null") || DEFAULT_PLAYERS.map(p=>({...p}));
+let presence  = new Set(JSON.parse(localStorage.getItem("presence_v4") || "[]"));
+let history   = JSON.parse(localStorage.getItem("cricketHistory_v4") || "[]");
+let comments  = JSON.parse(localStorage.getItem("cricketComments_v4") || "[]");
+let posts     = JSON.parse(localStorage.getItem("cricketPosts_v4") || "[]");
+let teamA = [], teamB = [], teamsGenerated = false;
+let coinSide = "heads", coinFlipping = false;
+let rankSort = "bat";
+
+/* ── LIVE SCORING STATE ── */
+const EMPTY_INNINGS = () => ({
+  battingTeam: "",
+  totalRuns: 0, totalWickets: 0, totalBalls: 0,
+  extras: {wides:0, noBalls:0, byes:0},
+  batsmen: [],      // [{name,runs,balls,fours,sixes,howOut,bowler,dismissed}]
+  bowlers: [],      // [{name,overs,runs,wickets,maidens,ballsInOver}]
+  currentBall1Idx: -1, // index of striker in batsmen array
+  currentBall2Idx: -1,
+  currentBowlerIdx: -1,
+  overHistory: [],   // array of per-over ball arrays
+  currentOverBalls: [], // [{type, run}]
+  inningsComplete: false,
+});
+
+let liveMatch = {
+  innings: [EMPTY_INNINGS(), EMPTY_INNINGS()],
+  currentInnings: 0,
+  overs: 20,
+  date: new Date().toISOString().slice(0,10),
+};
+try { const s = localStorage.getItem("liveMatch_v4"); if(s) liveMatch = JSON.parse(s); } catch(e){}
+
+let pendingSelCallback = null;
+let pendingWicketCallback = null;
+let broadcastStream = null;
+let broadcastPeerConnections = [];
+let postMediaFile = null;
+
+/* ── SAVE ── */
+function savePlayers() { localStorage.setItem("squadPlayers_v4",JSON.stringify(players)); setDoc(doc(db,"shared","players_v4"),{players}).catch(()=>{}); }
+function savePresence() {
+  localStorage.setItem(
+    "presence_v4",
+    JSON.stringify([...presence])
+  );
+
+  setDoc(
+    doc(db,"shared","presence_v4"),
+    { presence:[...presence] }
+  ).catch((err)=>{
+    console.error("Presence sync failed:", err);
+  });
+}
+function saveHistory() { localStorage.setItem("cricketHistory_v4",JSON.stringify(history)); setDoc(doc(db,"shared","history_v4"),{history}).catch(()=>{}); }
+function saveComments() { localStorage.setItem("cricketComments_v4",JSON.stringify(comments)); setDoc(doc(db,"shared","comments_v4"),{comments}).catch(()=>{}); }
+async function savePosts() {
+  localStorage.setItem("cricketPosts_v4",JSON.stringify(posts));
+  // Strip large dataURL media before pushing to Firestore (1MB doc limit)
+  const slim = posts.map(p => (p.mediaURL && p.mediaURL.startsWith("data:")) ? {...p, mediaURL:"", mediaType:"", _localMedia:true} : p);
+  try { await setDoc(doc(db,"shared","posts_v4"),{posts:slim}); }
+  catch(e) { console.warn("posts cloud save failed:",e); }
+}
+function saveLiveMatch() { localStorage.setItem("liveMatch_v4",JSON.stringify(liveMatch)); }
+
+/* ── CLOUD SYNC ── */
+async function initCloudSync() {
+  try {
+    const p=await getDoc(doc(db,"shared","players_v4")); if(p.exists()) players=p.data().players||players;
+    const pr=await getDoc(doc(db,"shared","presence_v4")); if(pr.exists()) presence=new Set(pr.data().presence||[]);
+    const h=await getDoc(doc(db,"shared","history_v4")); if(h.exists()) history=h.data().history||history;
+    const c=await getDoc(doc(db,"shared","comments_v4")); if(c.exists()) comments=c.data().comments||comments;
+    const po=await getDoc(doc(db,"shared","posts_v4")); if(po.exists()) posts=po.data().posts||posts;
+    renderAll();
+    onSnapshot(doc(db,"shared","history_v4"),(d)=>{if(d.exists()){history=d.data().history||[];renderHistory();}});
+    onSnapshot(doc(db,"shared","players_v4"),(d)=>{if(d.exists()){players=d.data().players||[];renderPresence();renderRatings();}});
+    onSnapshot(doc(db,"shared","presence_v4"),(d)=>{if(d.exists()){presence=new Set(d.data().presence||[]);renderPresence();}});
+    onSnapshot(doc(db,"shared","comments_v4"),(d)=>{if(d.exists()){comments=d.data().comments||[];renderComments();}});
+    onSnapshot(doc(db,"shared","posts_v4"),(d)=>{
+      if(!d.exists()) return;
+      const cloud = d.data().posts || [];
+      const cloudIds = new Set(cloud.map(p=>p.id));
+      // Keep any local-only posts (e.g. with dataURL media) that haven't synced
+      const localOnly = posts.filter(p=>!cloudIds.has(p.id));
+      // Prefer local copy when it carries dataURL media not in cloud
+      const merged = cloud.map(cp => {
+        const lp = posts.find(p=>p.id===cp.id);
+        if(lp && lp.mediaURL && lp.mediaURL.startsWith("data:")) return {...cp, mediaURL:lp.mediaURL, mediaType:lp.mediaType};
+        return cp;
+      });
+      posts = [...localOnly, ...merged].sort((a,b)=>b.id-a.id);
+      localStorage.setItem("cricketPosts_v4",JSON.stringify(posts));
+      renderPosts();
+    });
+  } catch(e){ console.log("sync:",e); }
+}
+setTimeout(initCloudSync, 1000);
+
+/* ── DOODLES ── */
+const DOODLE_PATHS = [
+  "M10 60 L15 10 L20 10 L25 60 L20 65 L15 65 Z M15 10 Q17.5 5 20 10",
+  "M5 20 A15 15 0 1 1 35 20 A15 15 0 1 1 5 20 M12 11 Q20 20 28 29 M8 29 Q20 20 32 11",
+  "M5 50 L5 10 M15 50 L15 10 M25 50 L25 10 M2 10 L28 10 M3 14 L27 14 M3 7 Q5 3 15 3 Q25 3 27 7",
+  "M5 30 Q5 10 25 10 Q45 10 45 30 L45 36 L5 36 Z M5 36 L5 42 Q15 46 25 46 Q35 46 45 42 L45 36 M20 10 L20 36 M22 14 L40 30",
+  "M10 50 L8 20 Q8 15 13 15 L13 30 L15 15 Q15 10 20 10 L20 28 L22 12 Q22 7 27 7 L27 26 L29 14 Q29 9 34 9 L34 30 Q38 34 38 40 Q38 50 30 55 L15 55 Z",
+  "M10 60 L10 10 Q10 5 18 5 Q26 5 26 10 L26 60 Q26 65 18 65 Q10 65 10 60 Z M8 20 L28 20 M8 30 L28 30 M8 40 L28 40 M8 50 L28 50",
+  "M5 15 L15 5 Q20 8 25 5 L35 15 L30 20 L25 14 L25 55 L15 55 L15 14 L10 20 Z",
+  "M20 2 L8 22 L17 22 L5 40 L25 16 L15 16 Z",
+];
+const POSITIONS = [
+  {top:"3%",left:"0.5%",size:55,rot:15},{top:"14%",left:"0.5%",size:45,rot:-20},
+  {top:"26%",left:"1%",size:50,rot:8},{top:"39%",left:"0.5%",size:42,rot:30},
+  {top:"52%",left:"1%",size:48,rot:-12},{top:"65%",left:"0.5%",size:55,rot:18},
+  {top:"5%",right:"0.5%",size:50,rot:-18},{top:"17%",right:"0.5%",size:45,rot:28},
+  {top:"30%",right:"1%",size:55,rot:-8},{top:"43%",right:"0.5%",size:42,rot:20},
+  {top:"57%",right:"1%",size:50,rot:-30},{top:"70%",right:"0.5%",size:42,rot:12},
+  {top:"8%",left:"6%",size:32,rot:-22},{top:"22%",left:"7%",size:30,rot:16},
+  {top:"36%",left:"6%",size:34,rot:-10},{top:"50%",left:"7%",size:28,rot:25},
+  {top:"10%",right:"6%",size:34,rot:20},{top:"23%",right:"7%",size:30,rot:-14},
+  {top:"37%",right:"6%",size:36,rot:10},{top:"51%",right:"7%",size:28,rot:-25},
+];
+function buildDoodles(id) {
+  const c = document.getElementById(id); if(!c) return;
+  c.innerHTML = '';
+  POSITIONS.forEach((pos,i) => {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+    svg.setAttribute("viewBox","0 0 50 70");
+    svg.classList.add("doodle-svg");
+    Object.assign(svg.style,{position:"absolute",width:pos.size+"px",height:pos.size+"px",transform:`rotate(${pos.rot}deg)`,opacity:"0.55"});
+    if(pos.top) svg.style.top=pos.top;
+    if(pos.left) svg.style.left=pos.left;
+    if(pos.right) svg.style.right=pos.right;
+    const p = document.createElementNS("http://www.w3.org/2000/svg","path");
+    p.setAttribute("d", DOODLE_PATHS[i%DOODLE_PATHS.length]);
+    svg.appendChild(p);
+    c.appendChild(svg);
+  });
+}
+
+/* ── INIT ── */
+try { buildDoodles("doodleContainer"); } catch(e){}
+try { buildDoodles("doodleContainerIntro"); } catch(e){}
+const today = new Date().toLocaleDateString("en-IN",{weekday:"short",day:"numeric",month:"short",year:"numeric"});
+const _setText=(id,t)=>{const el=document.getElementById(id); if(el) el.textContent=t;};
+_setText("dateBadge", today);
+_setText("dateBadge2", today);
+const _ld=document.getElementById("liveDate"); if(_ld) _ld.value = new Date().toISOString().slice(0,10);
+
+function renderAll() { renderPresence(); renderRatings(); renderHistory(); renderComments(); renderPosts(); renderLiveScore(); }
+
+/* ── APP START ── */
+function startApp() {
+  document.getElementById("introScreen").style.display = "none";
+  document.getElementById("mainApp").classList.add("visible");
+  buildDoodles("doodleContainerMain");
+  renderAll();
+}
+
+/* ── TABS ── */
+function switchTab(id, btn) {
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  document.getElementById("panel-"+id).classList.add("active");
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  if(id==="history") renderHistory();
+  if(id==="performers") renderPerformers("all");
+  if(id==="posts") { renderPosts(); renderPostsMatchBanner(); populateMatchSelect(); }
+  if(id==="live") renderLiveScore();
+}
+
+/* ── TOAST ── */
+function toast(msg) {
+  const el=document.getElementById("appToast");
+  el.textContent=msg; el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"),2800);
+}
+
+/* ── PRESENCE ── */
+function renderPresence() {
+  const grid=document.getElementById("presenceGrid");
+  grid.innerHTML='';
+  players.forEach(p=>{
+    const here=presence.has(p.name);
+    const div=document.createElement("div");
+    div.className="player-toggle"+(here?" present":"");
+    div.innerHTML=`
+      <div class="toggle-avatar">${p.name[0]}</div>
+      <div class="toggle-name">${p.name}</div>
+      <div class="chips-row">
+        <span class="chip chip-bat">${p.bat}</span>
+        <span class="chip chip-bowl">${p.bowl}</span>
+        <span class="chip chip-field">${p.fielding}</span>
+      </div>
+      <div class="toggle-dot"></div>`;
+    div.onclick=()=>{togglePresence(p.name);};
+    grid.appendChild(div);
+  });
+  document.getElementById("presentCount").textContent=presence.size;
+  document.getElementById("totalCount").textContent=players.length;
+}
+function togglePresence(name) { if(presence.has(name)) presence.delete(name); else presence.add(name); savePresence(); renderPresence(); }
+function selectAll()  { players.forEach(p=>presence.add(p.name)); savePresence(); renderPresence(); }
+function selectNone() { presence.clear(); savePresence(); renderPresence(); }
+function addPlayer() {
+  const name=document.getElementById("newPlayerName").value.trim();
+  if(!name){toast("Enter name!");return;}
+  if(players.find(p=>p.name.toLowerCase()===name.toLowerCase())){toast("Already exists!");return;}
+  players.push({name,bat:60,bowl:60,fielding:60}); savePlayers(); renderPresence(); renderRatings();
+  document.getElementById("newPlayerName").value=""; toast(name+" added!");
+}
+function addPlayer2() {
+  const name=document.getElementById("newPlayerName2").value.trim();
+  if(!name){toast("Enter name!");return;}
+  if(players.find(p=>p.name.toLowerCase()===name.toLowerCase())){toast("Already exists!");return;}
+  players.push({name,bat:60,bowl:60,fielding:60}); savePlayers(); renderPresence(); renderRatings();
+  document.getElementById("newPlayerName2").value=""; toast(name+" added!");
+}
+
+/* ── TEAMS ── */
+function composite(p){return(p.bat+p.bowl+p.fielding)/3;}
+function imbalance(A,B){
+  const d=k=>Math.abs(A.reduce((s,p)=>s+p[k],0)/Math.max(A.length,1)-B.reduce((s,p)=>s+p[k],0)/Math.max(B.length,1));
+  return d("bat")+d("bowl")+d("fielding");
+}
+function avg(arr,k){return arr.length?arr.reduce((s,p)=>s+p[k],0)/arr.length:0;}
+function getRole(p){
+  if(p.bat>=80&&p.bowl>=80) return "all";
+  if(p.bat>=p.bowl&&p.bat>=p.fielding&&p.bat>=75) return "bat";
+  if(p.bowl>=p.bat&&p.bowl>=p.fielding&&p.bowl>=75) return "bowl";
+  if(p.fielding>=80) return "field";
+  return "all";
+}
+function generateBalancedTeams(present) {
+  const sorted=[...present].sort(()=>Math.random()-.5).sort((a,b)=>composite(b)-composite(a)+(Math.random()-.5)*4);
+  let A=[],B=[];
+  sorted.forEach(p=>{const sA=A.reduce((s,x)=>s+composite(x),0);const sB=B.reduce((s,x)=>s+composite(x),0);(sA<=sB?A:B).push(p);});
+  for(let pass=0;pass<20;pass++){
+    let imp=false;
+    for(let a=0;a<A.length;a++) for(let b=0;b<B.length;b++){
+      const cur=imbalance(A,B);[A[a],B[b]]=[B[b],A[a]];
+      if(imbalance(A,B)<cur) imp=true; else [A[a],B[b]]=[B[b],A[a]];
+    }
+    if(!imp) break;
+  }
+  return [A,B];
+}
+function generateTeams() {
+  const present=players.filter(p=>presence.has(p.name));
+  if(present.length<2){toast("Need at least 2 players!");return;}
+  [teamA,teamB]=generateBalancedTeams(present);
+  teamsGenerated=true;
+  document.getElementById("genBtn").textContent="Shuffle Balanced Teams";
+  renderTeams(); toast("Teams shuffled!");
+}
+function renderTeams() {
+  const out=document.getElementById("teamsOutput");
+  if(!teamsGenerated){out.innerHTML='';return;}
+  const bA=avg(teamA,"bat"),bwA=avg(teamA,"bowl"),fA=avg(teamA,"fielding");
+  const bB=avg(teamB,"bat"),bwB=avg(teamB,"bowl"),fB=avg(teamB,"fielding");
+  const pw=(a,b)=>(((a/(a+b||1))*100).toFixed(1));
+  out.innerHTML=`
+    <div class="balance-section">
+      <div class="section-title" style="margin-bottom:12px">Team Balance</div>
+      ${[["Batting",bA,bB],["Bowling",bwA,bwB],["Fielding",fA,fB]].map(([l,a,b])=>`
+        <div class="balance-row">
+          <span class="balance-label">${l}</span>
+          <div class="balance-bar-track"><div class="balance-bar-fill" style="width:${pw(a,b)}%"></div></div>
+          <span class="balance-nums">A:${a.toFixed(1)} B:${b.toFixed(1)}</span>
+        </div>`).join('')}
+    </div>
+    <div class="teams-grid">
+      ${[["Team A",teamA],["Team B",teamB]].map(([lbl,team])=>`
+        <div class="team-card">
+          <div class="team-header">${lbl}
+            <div style="display:flex;gap:4px;font-size:10px">
+              <span class="chip chip-bat">${avg(team,"bat").toFixed(0)}</span>
+              <span class="chip chip-bowl">${avg(team,"bowl").toFixed(0)}</span>
+              <span class="chip chip-field">${avg(team,"fielding").toFixed(0)}</span>
+            </div>
+          </div>
+          ${team.map(p=>`
+            <div class="team-player">
+              <span class="role-tag role-${getRole(p)}">${getRole(p).toUpperCase()}</span>
+              <span style="flex:1;color:var(--mint);font-weight:bold;font-size:12px">${p.name}</span>
+              <div class="chips-row">
+                <span class="chip chip-bat">${p.bat}</span>
+                <span class="chip chip-bowl">${p.bowl}</span>
+                <span class="chip chip-field">${p.fielding}</span>
+              </div>
+            </div>`).join('')}
+        </div>`).join('')}
+    </div>`;
+}
+
+/* ── COIN ── */
+function chooseSide(s) {
+  coinSide=s;
+  document.getElementById("chooseHeads").className="btn btn-sm "+(s==="heads"?"btn-accent":"btn-outline");
+  document.getElementById("chooseTails").className="btn btn-sm "+(s==="tails"?"btn-accent":"btn-outline");
+}
+function tossCoin() {
+  if(coinFlipping) return; coinFlipping=true;
+  document.getElementById("coinResult").innerHTML='';
+  const coin=document.getElementById("coin");
+  coin.classList.remove("flipping"); void coin.offsetWidth; coin.classList.add("flipping");
+  setTimeout(()=>{
+    const outcome=Math.random()<.5?"heads":"tails";
+    coin.textContent=outcome==="heads"?"H":"T"; coin.classList.remove("flipping");
+    const winner=outcome===coinSide?"Team A":"Team B";
+    document.getElementById("coinResult").innerHTML=`
+      <div class="coin-result">${winner} wins the toss!</div>
+      <div style="margin-top:6px;font-size:11px;color:var(--beige)">Result: <strong style="color:var(--mint)">${outcome.toUpperCase()}</strong></div>`;
+    coinFlipping=false;
+  },1300);
+}
+
+/* ══════════════════════════════════════════════════════
+   LIVE SCORING SYSTEM
+══════════════════════════════════════════════════════ */
+function getInnings() { return liveMatch.innings[liveMatch.currentInnings]; }
+
+function switchLiveInnings(idx, btn) {
+  liveMatch.currentInnings=idx;
+  saveLiveMatch();
+  document.querySelectorAll(".innings-tab").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  renderLiveScore();
+}
+
+function resetLiveInnings() {
+  const inn = liveMatch.innings[liveMatch.currentInnings];
+  const bt = document.getElementById("liveBattingTeam").value;
+  const ov = parseInt(document.getElementById("liveOvers").value)||20;
+  const dt = document.getElementById("liveDate").value;
+  liveMatch.overs = ov;
+  liveMatch.date = dt;
+  liveMatch.innings[liveMatch.currentInnings] = EMPTY_INNINGS();
+  liveMatch.innings[liveMatch.currentInnings].battingTeam = bt;
+  saveLiveMatch();
+  renderLiveScore();
+  toast("Innings reset!");
+}
+
+function getTeamPlayers(teamName) {
+  if(teamName==="Team A" && teamA.length) return teamA;
+  if(teamName==="Team B" && teamB.length) return teamB;
+  return players.filter(p=>presence.has(p.name));
+}
+
+function getOrAddBatsman(name) {
+  const inn=getInnings();
+  let idx=inn.batsmen.findIndex(b=>b.name===name);
+  if(idx===-1){
+    inn.batsmen.push({name,runs:0,balls:0,fours:0,sixes:0,howOut:"",bowler:"",dismissed:false,extras:{wides:0,noBalls:0}});
+    idx=inn.batsmen.length-1;
+  }
+  return idx;
+}
+function getOrAddBowler(name) {
+  const inn=getInnings();
+  let idx=inn.bowlers.findIndex(b=>b.name===name);
+  if(idx===-1){
+    inn.bowlers.push({name,overs:0,runs:0,wickets:0,maidens:0,ballsInOver:0,balls:0});
+    idx=inn.bowlers.length-1;
+  }
+  return idx;
+}
+
+/* Select Modal */
+function openSelModal(role) {
+  const inn=getInnings();
+  const battingPlayers=getTeamPlayers(inn.battingTeam||"");
+  const modal=document.getElementById("selModal");
+  const list=document.getElementById("selList");
+  const title=document.getElementById("selModalTitle");
+  modal.classList.remove("hidden");
+
+  if(role==="bat1"||role==="bat2") {
+    title.textContent="Select Batsman";
+    const dismissed=inn.batsmen.filter(b=>b.dismissed).map(b=>b.name);
+    const available=battingPlayers.filter(p=>!dismissed.includes(p.name));
+    list.innerHTML=available.map(p=>`
+      <div class="sel-item" onclick="selectBatsman('${role}','${p.name}')">
+        ${p.name}
+        <span class="sel-item-stats">Bat:${p.bat}</span>
+      </div>`).join('');
+  } else if(role==="bowler") {
+    title.textContent="Select Bowler";
+    const inn=getInnings();
+    const battingTeam=inn.battingTeam||"";
+    const bowlingTeamName=battingTeam==="Team A"?"Team B":battingTeam==="Team B"?"Team A":"";
+    const bowlingPlayers=getTeamPlayers(bowlingTeamName)||players.filter(p=>presence.has(p.name));
+    list.innerHTML=bowlingPlayers.map(p=>{
+      const b=inn.bowlers.find(bw=>bw.name===p.name);
+      const ovs=b?`${Math.floor(b.balls/6)}.${b.balls%6} ov, ${b.runs}R ${b.wickets}W`:"0.0 ov";
+      return `<div class="sel-item" onclick="selectBowlerModal('${p.name}')">
+        ${p.name}
+        <span class="sel-item-stats">${ovs}</span>
+      </div>`;
+    }).join('');
+  }
+  pendingSelCallback=role;
+}
+
+function selectBatsman(role, name) {
+  const inn=getInnings();
+  const idx=getOrAddBatsman(name);
+  if(role==="bat1") inn.currentBall1Idx=idx;
+  else inn.currentBall2Idx=idx;
+  closeSelModal();
+  saveLiveMatch();
+  renderLiveScore();
+}
+
+function selectBowlerModal(name) {
+  const inn=getInnings();
+  const idx=getOrAddBowler(name);
+  // finalize previous bowler's over if any
+  const prev=inn.currentBowlerIdx;
+  if(prev!==-1 && prev!==idx) {
+    const prevB=inn.bowlers[prev];
+    if(prevB.ballsInOver===6){prevB.overs+=1;prevB.ballsInOver=0;}
+  }
+  inn.currentBowlerIdx=idx;
+  closeSelModal();
+  saveLiveMatch();
+  renderLiveScore();
+}
+
+function closeSelModal() {
+  document.getElementById("selModal").classList.add("hidden");
+  pendingSelCallback=null;
+}
+
+/* Wicket Modal */
+function openWicketModal() {
+  const inn=getInnings();
+  const modal=document.getElementById("wicketModal");
+  const batsmanSel=document.getElementById("wkt-batsman");
+  const bowlerSel=document.getElementById("wkt-bowler");
+  const catcherSel=document.getElementById("wkt-catcher");
+
+  const onStrike=[inn.currentBall1Idx,inn.currentBall2Idx]
+    .filter(i=>i!==-1)
+    .map(i=>inn.batsmen[i]);
+
+  batsmanSel.innerHTML=onStrike.map(b=>`<option>${b.name}</option>`).join('');
+  
+  const battingTeam=inn.battingTeam||"";
+  const bowlingTeamName=battingTeam==="Team A"?"Team B":battingTeam==="Team B"?"Team A":"";
+  const bowlingPlayers=getTeamPlayers(bowlingTeamName)||players;
+  bowlerSel.innerHTML=bowlingPlayers.map(p=>`<option ${inn.bowlers[inn.currentBowlerIdx]?.name===p.name?"selected":""}>${p.name}</option>`).join('');
+  catcherSel.innerHTML=`<option value="">None</option>`+bowlingPlayers.map(p=>`<option>${p.name}</option>`).join('');
+
+  document.getElementById("wkt-type").onchange=function(){
+    document.getElementById("wkt-catcher-row").style.display=this.value==="Caught"?"block":"none";
+  };
+  modal.classList.remove("hidden");
+}
+
+function cancelWicket() { document.getElementById("wicketModal").classList.add("hidden"); }
+
+function confirmWicket() {
+  const inn=getInnings();
+  const batsmanName=document.getElementById("wkt-batsman").value;
+  const bowlerName=document.getElementById("wkt-bowler").value;
+  const dismissalType=document.getElementById("wkt-type").value;
+  const catcher=document.getElementById("wkt-catcher").value;
+
+  const bidx=inn.batsmen.findIndex(b=>b.name===batsmanName);
+  if(bidx!==-1){
+    const bat=inn.batsmen[bidx];
+    bat.dismissed=true;
+    bat.howOut=dismissalType+(catcher?` (${catcher})`:"");
+    bat.bowler=bowlerName;
+  }
+
+  // update bowler wickets
+  const bowIdx=getOrAddBowler(bowlerName);
+  inn.bowlers[bowIdx].wickets++;
+
+  inn.totalWickets++;
+
+  // ball counts (wicket ball)
+  addDeliveryToOver("W",0);
+
+  // clear dismissed batsman from crease
+  if(inn.currentBall1Idx===bidx) inn.currentBall1Idx=-1;
+  if(inn.currentBall2Idx===bidx) inn.currentBall2Idx=-1;
+
+  document.getElementById("wicketModal").classList.add("hidden");
+  saveLiveMatch(); renderLiveScore();
+  toast(`${batsmanName} out! ${dismissalType}`);
+}
+
+/* Add Ball */
+function addBall(type) {
+  const inn=getInnings();
+  if(inn.currentBowlerIdx===-1){toast("Select bowler first!");return;}
+  if(inn.currentBall1Idx===-1){toast("Select striker first!");return;}
+
+  const bat1=inn.batsmen[inn.currentBall1Idx];
+  const bowler=inn.bowlers[inn.currentBowlerIdx];
+
+  if(type==="wd") {
+    inn.totalRuns++;
+    inn.extras.wides++;
+    bowler.runs++;
+    addDeliveryToOver("WD",1); // wide does NOT count as a legal delivery
+    saveLiveMatch(); renderLiveScore(); return;
+  }
+  if(type==="nb") {
+    inn.totalRuns++;
+    inn.extras.noBalls++;
+    bowler.runs++;
+    bat1.extras=bat1.extras||{wides:0,noBalls:0};
+    bat1.extras.noBalls=(bat1.extras.noBalls||0)+1;
+    addDeliveryToOver("NB",1); // NB also not legal
+    saveLiveMatch(); renderLiveScore(); return;
+  }
+  if(type==="nbf") {
+    // no-ball fast: no run added, not a legal delivery
+    inn.extras.noBalls++;
+    addDeliveryToOver("NB",0);
+    saveLiveMatch(); renderLiveScore(); return;
+  }
+  if(type==="dot") {
+    bat1.balls++;
+    bowler.balls++;
+    addDeliveryToOver("0",0);
+    checkEndOfOver();
+    swapIfOdd(0);
+  } else {
+    const runs=parseInt(type);
+    inn.totalRuns+=runs;
+    bat1.runs+=runs;
+    bat1.balls++;
+    if(runs===4) bat1.fours++;
+    if(runs===6) bat1.sixes++;
+    bowler.runs+=runs;
+    bowler.balls++;
+    addDeliveryToOver(String(runs),runs);
+    checkEndOfOver();
+    swapIfOdd(runs);
+  }
+  inn.totalBalls++;
+  saveLiveMatch(); renderLiveScore();
+}
+
+function swapIfOdd(runs) {
+  // swap strike on odd runs
+  if(runs%2===1) swapStrikeInternal();
+}
+
+function swapStrike() { swapStrikeInternal(); saveLiveMatch(); renderLiveScore(); }
+function swapStrikeInternal() {
+  const inn=getInnings();
+  [inn.currentBall1Idx,inn.currentBall2Idx]=[inn.currentBall2Idx,inn.currentBall1Idx];
+}
+
+function addDeliveryToOver(type,run) {
+  const inn=getInnings();
+  inn.currentOverBalls.push({type,run});
+}
+
+function checkEndOfOver() {
+  const inn=getInnings();
+  const bowler=inn.bowlers[inn.currentBowlerIdx];
+  if(bowler.balls>0 && bowler.balls%6===0) {
+    // over complete
+    bowler.overs++;
+    if(inn.currentOverBalls.every(b=>b.run===0)) bowler.maidens++;
+    inn.overHistory.push([...inn.currentOverBalls]);
+    inn.currentOverBalls=[];
+    // swap strike at end of over
+    swapStrikeInternal();
+    toast("Over complete!");
+  }
+}
+
+function undoLastBall() {
+  const inn=getInnings();
+  if(!inn.currentOverBalls.length && !inn.overHistory.length){toast("Nothing to undo!");return;}
+  // simple approach: just pop last ball from currentOverBalls
+  const last=inn.currentOverBalls.pop();
+  if(!last){toast("Nothing to undo!");return;}
+  const bowler=inn.bowlers[inn.currentBowlerIdx];
+  if(last.type!=="WD"&&last.type!=="NB") {
+    if(bowler) bowler.balls=Math.max(0,bowler.balls-1);
+    inn.totalBalls=Math.max(0,inn.totalBalls-1);
+    const bat=inn.batsmen[inn.currentBall1Idx];
+    if(bat&&last.run>0){bat.runs=Math.max(0,bat.runs-last.run);bat.balls=Math.max(0,bat.balls-1);}
+    if(bat&&last.run===0&&last.type==="0") bat.balls=Math.max(0,bat.balls-1);
+    if(bowler&&last.run>0) bowler.runs=Math.max(0,bowler.runs-last.run);
+    if(last.type==="4"&&bat) bat.fours=Math.max(0,bat.fours-1);
+    if(last.type==="6"&&bat) bat.sixes=Math.max(0,bat.sixes-1);
+    inn.totalRuns=Math.max(0,inn.totalRuns-last.run);
+  } else {
+    inn.totalRuns=Math.max(0,inn.totalRuns-last.run);
+    if(last.type==="WD") inn.extras.wides=Math.max(0,inn.extras.wides-1);
+    if(last.type==="NB") inn.extras.noBalls=Math.max(0,inn.extras.noBalls-1);
+    if(bowler) bowler.runs=Math.max(0,bowler.runs-last.run);
+  }
+  saveLiveMatch(); renderLiveScore(); toast("Undone!");
+}
+
+/* Render Live Score */
+function renderLiveScore() {
+  const inn=getInnings();
+  const totalBalls=inn.totalBalls;
+  const overs=Math.floor(totalBalls/6);
+  const balls=totalBalls%6;
+  const rr=totalBalls>0?((inn.totalRuns/(totalBalls))*6).toFixed(2):"0.00";
+  document.getElementById("liveTotalDisp").textContent=`${inn.totalRuns}/${inn.totalWickets}`;
+  document.getElementById("liveMetaDisp").textContent=`${overs}.${balls} overs · ${inn.extras.wides} wd · ${inn.extras.noBalls} nb`;
+  document.getElementById("liveRRDisp").textContent=`RR: ${rr}`;
+
+  // bat1
+  const b1=inn.currentBall1Idx!==-1?inn.batsmen[inn.currentBall1Idx]:null;
+  const b2=inn.currentBall2Idx!==-1?inn.batsmen[inn.currentBall2Idx]:null;
+  renderBatCard("bat1",b1,"bat1Score","bat1Balls","bat1SR","bat1Name","bat1Extras");
+  renderBatCard("bat2",b2,"bat2Score","bat2Balls","bat2SR","bat2Name");
+
+  // bowler
+  const bowler=inn.currentBowlerIdx!==-1?inn.bowlers[inn.currentBowlerIdx]:null;
+  document.getElementById("bowlerName").textContent=bowler?bowler.name:"— Select —";
+  if(bowler){
+    const bov=Math.floor(bowler.balls/6),bbl=bowler.balls%6;
+    document.getElementById("bowlerStats").textContent=`${bowler.wickets}-${bowler.runs} (${bov}.${bbl})`;
+  } else {
+    document.getElementById("bowlerStats").textContent="0-0 (0.0)";
+  }
+
+  // over balls
+  const ob=document.getElementById("overBalls");
+  ob.innerHTML=inn.currentOverBalls.map(b=>{
+    const cls=b.type==="4"?"ball-4":b.type==="6"?"ball-6":b.type==="W"?"ball-W":b.type==="WD"?"ball-WD":b.type==="NB"?"ball-NB":"ball-0";
+    return `<div class="ball-dot ${cls}">${b.type==="0"?"·":b.type}</div>`;
+  }).join('');
+
+  // yet to bat
+  renderYetToBat();
+  renderYetToBowl();
+
+  // batting scorecard
+  renderLiveBattingCard();
+  renderLiveBowlingCard();
+}
+
+function renderBatCard(cardId,bat,scoreId,ballsId,srId,nameId,extrasId) {
+  if(nameId) document.getElementById(nameId).textContent=bat?bat.name:"—";
+  if(scoreId) document.getElementById(scoreId).textContent=bat?bat.runs:0;
+  if(ballsId) document.getElementById(ballsId).textContent=bat?`(${bat.balls}b)`:"(0b)";
+  if(srId) {
+    const sr=bat&&bat.balls>0?((bat.runs/bat.balls)*100).toFixed(1):"—";
+    document.getElementById(srId).textContent=`SR: ${sr}`;
+  }
+  if(extrasId&&bat) {
+    const ex=bat.extras||{};
+    document.getElementById(extrasId).textContent=(ex.fours||0)>0||(ex.sixes||0)>0?`4s:${bat.fours||0} 6s:${bat.sixes||0}`:`4s:${bat.fours||0} 6s:${bat.sixes||0}`;
+  }
+}
+
+function renderYetToBat() {
+  const inn=getInnings();
+  const battingPlayers=getTeamPlayers(inn.battingTeam||"");
+  const batted=new Set(inn.batsmen.map(b=>b.name));
+  const yet=battingPlayers.filter(p=>!batted.has(p.name));
+  const el=document.getElementById("yetToBat");
+  el.innerHTML=yet.length?yet.map(p=>`<span class="pool-pill">${p.name}</span>`).join(''):`<span class="pool-empty">All players have batted</span>`;
+}
+
+function renderYetToBowl() {
+  const inn=getInnings();
+  const battingTeam=inn.battingTeam||"";
+  const bowlingTeamName=battingTeam==="Team A"?"Team B":battingTeam==="Team B"?"Team A":"";
+  const bowlingPlayers=getTeamPlayers(bowlingTeamName)||players.filter(p=>presence.has(p.name));
+  const bowled=new Set(inn.bowlers.map(b=>b.name));
+  const yet=bowlingPlayers.filter(p=>!bowled.has(p.name));
+  const el=document.getElementById("yetToBowl");
+  el.innerHTML=yet.length?yet.map(p=>`<span class="pool-pill">${p.name}</span>`).join(''):`<span class="pool-empty">All players have bowled</span>`;
+}
+
+function renderLiveBattingCard() {
+  const inn=getInnings();
+  const el=document.getElementById("liveBattingCard");
+  if(!inn.batsmen.length){el.innerHTML=`<div style="padding:14px;color:var(--beige);font-size:13px">No batsmen yet</div>`;return;}
+  el.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:12px">
+    <thead><tr style="background:rgba(17,100,102,0.15)">
+      <th style="padding:8px 12px;text-align:left;font-family:var(--mono);font-size:9px;color:var(--beige);text-transform:uppercase">Batsman</th>
+      <th style="padding:8px;font-family:var(--mono);font-size:9px;color:var(--beige);text-align:right">R</th>
+      <th style="padding:8px;font-family:var(--mono);font-size:9px;color:var(--beige);text-align:right">B</th>
+      <th style="padding:8px;font-family:var(--mono);font-size:9px;color:var(--beige);text-align:right">4s</th>
+      <th style="padding:8px;font-family:var(--mono);font-size:9px;color:var(--beige);text-align:right">6s</th>
+      <th style="padding:8px;font-family:var(--mono);font-size:9px;color:var(--beige)">How Out</th>
+    </tr></thead>
+    <tbody>
+    ${inn.batsmen.map((b,i)=>{
+      const isStrike=i===inn.currentBall1Idx;
+      const isNonStrike=i===inn.currentBall2Idx;
+      const sr=b.balls>0?((b.runs/b.balls)*100).toFixed(0):"—";
+      return `<tr style="border-bottom:1px solid rgba(209,232,226,0.05)${b.dismissed?";opacity:.65":""}">
+        <td style="padding:8px 12px;color:var(--mint);font-weight:bold">
+          ${b.name}${isStrike?' <span style="color:var(--peach);font-size:10px">★</span>':""}${isNonStrike?' <span style="color:var(--beige);font-size:10px">◇</span>':""}
+        </td>
+        <td style="padding:8px;text-align:right;color:var(--peach);font-weight:900;font-family:var(--mono)">${b.runs}</td>
+        <td style="padding:8px;text-align:right;font-family:var(--mono);color:var(--beige)">${b.balls}</td>
+        <td style="padding:8px;text-align:right;font-family:var(--mono);color:var(--beige)">${b.fours||0}</td>
+        <td style="padding:8px;text-align:right;font-family:var(--mono);color:var(--beige)">${b.sixes||0}</td>
+        <td style="padding:8px;font-size:10px;color:${b.dismissed?"#ff7070":"var(--mint)"}">${b.dismissed?b.howOut+' b '+b.bowler:"not out"}</td>
+      </tr>`;
+    }).join('')}
+    </tbody>
+    <tfoot><tr style="background:rgba(17,100,102,0.1)">
+      <td colspan="6" style="padding:8px 12px;font-family:var(--mono);font-size:11px;color:var(--peach);font-weight:bold">
+        Total: ${inn.totalRuns}/${inn.totalWickets} · Extras: ${inn.extras.wides+inn.extras.noBalls+inn.extras.byes} (${inn.extras.wides} wd, ${inn.extras.noBalls} nb)
+      </td>
+    </tr></tfoot>
+  </table>`;
+}
+
+function renderLiveBowlingCard() {
+  const inn=getInnings();
+  const el=document.getElementById("liveBowlingCard");
+  if(!inn.bowlers.length){el.innerHTML=`<div style="padding:14px;color:var(--beige);font-size:13px">No bowlers yet</div>`;return;}
+  el.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:12px">
+    <thead><tr style="background:rgba(17,100,102,0.15)">
+      <th style="padding:8px 12px;text-align:left;font-family:var(--mono);font-size:9px;color:var(--beige);text-transform:uppercase">Bowler</th>
+      <th style="padding:8px;font-family:var(--mono);font-size:9px;color:var(--beige);text-align:right">O</th>
+      <th style="padding:8px;font-family:var(--mono);font-size:9px;color:var(--beige);text-align:right">R</th>
+      <th style="padding:8px;font-family:var(--mono);font-size:9px;color:var(--beige);text-align:right">W</th>
+      <th style="padding:8px;font-family:var(--mono);font-size:9px;color:var(--beige);text-align:right">M</th>
+      <th style="padding:8px;font-family:var(--mono);font-size:9px;color:var(--beige);text-align:right">Econ</th>
+    </tr></thead>
+    <tbody>
+    ${inn.bowlers.map((b,i)=>{
+      const bov=Math.floor(b.balls/6),bbl=b.balls%6;
+      const ovsNum=bov+(bbl/10);
+      const econ=b.balls>0?((b.runs/(b.balls))*6).toFixed(2):"—";
+      return `<tr style="border-bottom:1px solid rgba(209,232,226,0.05)${i===inn.currentBowlerIdx?";background:rgba(17,100,102,0.1)":""}">
+        <td style="padding:8px 12px;color:var(--mint);font-weight:bold">${b.name}${i===inn.currentBowlerIdx?' <span style="color:var(--peach);font-size:9px">▶</span>':""}</td>
+        <td style="padding:8px;text-align:right;font-family:var(--mono);color:var(--beige)">${bov}.${bbl}</td>
+        <td style="padding:8px;text-align:right;font-family:var(--mono);color:var(--beige)">${b.runs}</td>
+        <td style="padding:8px;text-align:right;font-family:var(--mono);color:var(--peach);font-weight:bold">${b.wickets}</td>
+        <td style="padding:8px;text-align:right;font-family:var(--mono);color:var(--beige)">${b.maidens||0}</td>
+        <td style="padding:8px;text-align:right;font-family:var(--mono);color:var(--beige)">${econ}</td>
+      </tr>`;
+    }).join('')}
+    </tbody>
+  </table>`;
+}
+
+function saveMatchFromLive() {
+  const inn0=liveMatch.innings[0];
+  const inn1=liveMatch.innings[1];
+  const date=liveMatch.date||new Date().toISOString().slice(0,10);
+  const overs=liveMatch.overs||20;
+  const totalA=inn0.totalRuns, wkA=inn0.totalWickets;
+  const totalB=inn1.totalRuns, wkB=inn1.totalWickets;
+  let result="No Result";
+  if(totalA>totalB) result="Team A Won";
+  else if(totalB>totalA) result="Team B Won";
+  else if(totalA===totalB&&(totalA>0||totalB>0)) result="Tie";
+  const match={
+    id:Date.now(), date, overs, result,
+    teamA:teamA.map(p=>p.name), teamB:teamB.map(p=>p.name),
+    inningsA:{batting:inn0.batsmen,bowling:inn0.bowlers,total:totalA,wickets:wkA,extras:inn0.extras},
+    inningsB:{batting:inn1.batsmen,bowling:inn1.bowlers,total:totalB,wickets:wkB,extras:inn1.extras},
+  };
+  history.unshift(match);
+  saveHistory();
+  toast("Match saved!");
+  renderHistory();
+}
+
+/* ── HISTORY ── */
+function renderHistory(search="") {
+  const list=document.getElementById("historyList");
+  const filtered=history.filter(m=>!search||m.date?.includes(search)||m.result?.toLowerCase().includes(search.toLowerCase()));
+  if(!filtered.length){list.innerHTML=`<div style="text-align:center;color:var(--beige);padding:40px 20px">No matches yet!</div>`;return;}
+  list.innerHTML=filtered.map(m=>{
+    const rc=m.result?.includes("A Won")?"result-win":m.result?.includes("B Won")?"result-loss":"result-draw";
+    return `<div class="history-card">
+      <div class="history-card-header" onclick="toggleHistory(${m.id})">
+        <span class="history-date">${m.date} · ${m.overs||"?"}ov</span>
+        <span class="history-result ${rc}">${m.result||"No Result"}</span>
+        <span style="color:var(--beige);font-size:13px" id="arr-${m.id}">▼</span>
+      </div>
+      <div class="history-scores">A: ${m.inningsA?.total||0}/${m.inningsA?.wickets||0} · B: ${m.inningsB?.total||0}/${m.inningsB?.wickets||0}</div>
+      <div class="history-detail" id="hd-${m.id}">
+        <div style="color:var(--beige);font-family:var(--mono);font-size:11px;margin-bottom:6px">Team A: ${m.teamA?.join(", ")||"—"}</div>
+        <div style="color:var(--beige);font-family:var(--mono);font-size:11px;margin-bottom:10px">Team B: ${m.teamB?.join(", ")||"—"}</div>
+        ${[...(m.inningsA?.batting||[]),...(m.inningsB?.batting||[])].filter(b=>b.runs>0||b.balls>0).map(b=>`
+          <div class="history-stat-row">
+            <span style="color:var(--mint);font-weight:bold">${b.name}</span>
+            <span style="font-family:var(--mono);font-size:11px;color:var(--peach)">${b.runs}(${b.balls}b)${b.fours>0?" "+b.fours+"×4":""}${b.sixes>0?" "+b.sixes+"×6":""}</span>
+          </div>`).join('')}
+        <button class="btn btn-danger btn-sm" style="margin-top:10px" onclick="deleteMatch(${m.id})">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function toggleHistory(id) {
+  const d=document.getElementById("hd-"+id),a=document.getElementById("arr-"+id);
+  d.classList.toggle("open"); a.textContent=d.classList.contains("open")?"▲":"▼";
+}
+function deleteMatch(id) {
+  if(!confirm("Delete this match?")) return;
+  history=history.filter(m=>m.id!==id); saveHistory(); renderHistory(); toast("Deleted");
+}
+
+/* ── BEST PERFORMERS ── */
+function renderPerformers(filter) {
+  document.querySelectorAll(".performers-filter .btn").forEach(b=>b.className="btn btn-outline btn-sm");
+  event&&event.target&&(event.target.className="btn btn-accent btn-sm");
+  
+  let matches=[...history];
+  if(filter==="match") matches=matches.slice(0,1);
+  if(filter==="month") {
+    const now=new Date();
+    const mo=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;
+    matches=matches.filter(m=>m.date?.startsWith(mo));
+  }
+
+  // aggregate
+  const stats={};
+  matches.forEach(m=>{
+    [...(m.inningsA?.batting||[]),...(m.inningsB?.batting||[])].forEach(b=>{
+      if(!stats[b.name]) stats[b.name]={name:b.name,runs:0,balls:0,topScore:0,innings:0,fours:0,sixes:0};
+      stats[b.name].runs+=b.runs||0;
+      stats[b.name].balls+=b.balls||0;
+      stats[b.name].fours+=b.fours||0;
+      stats[b.name].sixes+=b.sixes||0;
+      stats[b.name].innings++;
+      if((b.runs||0)>stats[b.name].topScore) stats[b.name].topScore=b.runs;
+    });
+    [...(m.inningsA?.bowling||[]),...(m.inningsB?.bowling||[])].forEach(b=>{
+      if(!stats[b.name]) stats[b.name]={name:b.name,runs:0,balls:0,topScore:0,innings:0,fours:0,sixes:0};
+      stats[b.name].wickets=(stats[b.name].wickets||0)+(b.wickets||0);
+      stats[b.name].bowlRuns=(stats[b.name].bowlRuns||0)+(b.runs||0);
+      stats[b.name].bowlBalls=(stats[b.name].bowlBalls||0)+((b.balls||0)+(b.overs||0)*6);
+    });
+  });
+
+  const arr=Object.values(stats);
+  if(!arr.length){
+    document.getElementById("performerGrid").innerHTML=`<div style="text-align:center;color:var(--beige);padding:30px">No match data yet</div>`;
+    document.getElementById("performerHistory").innerHTML="";
+    return;
+  }
+
+  const topBat=[...arr].sort((a,b)=>b.runs-a.runs)[0];
+  const topBowl=[...arr].filter(a=>a.wickets>0).sort((a,b)=>b.wickets-a.wickets)[0];
+  const topSR=[...arr].filter(a=>a.balls>5).sort((a,b)=>((b.runs/b.balls)*100)-((a.runs/a.balls)*100))[0];
+  const top6=[...arr].sort((a,b)=>(b.sixes||0)-(a.sixes||0))[0];
+  const topEcon=[...arr].filter(a=>(a.bowlBalls||0)>12).sort((a,b)=>((a.bowlRuns||0)/(a.bowlBalls||1)*6)-((b.bowlRuns||0)/(b.bowlBalls||1)*6))[0];
+
+  const cards=[
+    {label:"🏏 Top Scorer",icon:"🏅",p:topBat,stat:topBat?`${topBat.runs} runs (${topBat.balls}b) | Best: ${topBat.topScore}`:""},
+    {label:"⚡ Best Bowler",icon:"🎯",p:topBowl,stat:topBowl?`${topBowl.wickets} wkts | ${topBowl.bowlRuns}R`:""},
+    {label:"🚀 Best Strike Rate",icon:"💥",p:topSR,stat:topSR?`SR: ${((topSR.runs/topSR.balls)*100).toFixed(1)}`:""},
+    {label:"6️⃣ Most Sixes",icon:"💫",p:top6,stat:top6?`${top6.sixes||0} sixes`:""},
+    {label:"🎳 Best Economy",icon:"📊",p:topEcon,stat:topEcon?`Econ: ${((topEcon.bowlRuns||0)/(topEcon.bowlBalls||1)*6).toFixed(2)}`:""},
+  ].filter(c=>c.p);
+
+  document.getElementById("performerGrid").innerHTML=`<div class="performer-grid">${
+    cards.map(c=>`<div class="performer-card">
+      <div class="performer-label">${c.label}</div>
+      <div class="performer-name">${c.p.name}</div>
+      <div class="performer-stat">${c.stat}</div>
+    </div>`).join('')
+  }</div>`;
+
+  // all batsmen sorted
+  const sorted=[...arr].filter(a=>a.innings>0).sort((a,b)=>b.runs-a.runs);
+  document.getElementById("performerHistory").innerHTML=`
+    <div class="card"><div class="card-header"><span class="section-title">All Batting Stats</span></div>
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead><tr style="background:rgba(17,100,102,0.15)">
+        ${["Player","Runs","Balls","4s","6s","SR","Best"].map(h=>`<th style="padding:8px 10px;font-family:var(--mono);font-size:9px;color:var(--beige);text-transform:uppercase;text-align:right;first-child:text-align:left">${h}</th>`).join('')}
+      </tr></thead>
+      <tbody>${sorted.map(s=>`<tr style="border-bottom:1px solid rgba(209,232,226,0.05)">
+        <td style="padding:8px 10px;color:var(--mint);font-weight:bold">${s.name}</td>
+        <td style="padding:8px 10px;text-align:right;font-family:var(--mono);color:var(--peach);font-weight:bold">${s.runs}</td>
+        <td style="padding:8px 10px;text-align:right;font-family:var(--mono);color:var(--beige)">${s.balls}</td>
+        <td style="padding:8px 10px;text-align:right;font-family:var(--mono);color:var(--beige)">${s.fours||0}</td>
+        <td style="padding:8px 10px;text-align:right;font-family:var(--mono);color:var(--beige)">${s.sixes||0}</td>
+        <td style="padding:8px 10px;text-align:right;font-family:var(--mono);color:var(--beige)">${s.balls>0?((s.runs/s.balls)*100).toFixed(0):"—"}</td>
+        <td style="padding:8px 10px;text-align:right;font-family:var(--mono);color:var(--peach)">${s.topScore}</td>
+      </tr>`).join('')}
+      </tbody></table></div>`;
+}
+
+/* ── RATINGS ── */
+function renderRatings() {
+  const ed=document.getElementById("ratingsEditor");
+  ed.innerHTML=`
+    <div class="card-header"><span class="section-title">Player Ratings</span></div>
+    <div class="rating-col-header">
+      <span>Player</span><span>Batting</span><span>Bowling</span><span>Fielding</span><span></span>
+    </div>
+    ${players.map((p,i)=>`
+      <div class="rating-row">
+        <span class="pname">${p.name}</span>
+        <div class="rating-cell">
+          <input id="r_bat_${i}" class="rating-input" type="number" value="${p.bat}" min="0" max="100" />
+          <div class="mini-bar" style="background:var(--peach);width:${p.bat}%"></div>
+        </div>
+        <div class="rating-cell">
+          <input id="r_bowl_${i}" class="rating-input" type="number" value="${p.bowl}" min="0" max="100" />
+          <div class="mini-bar" style="background:var(--mint);width:${p.bowl}%"></div>
+        </div>
+        <div class="rating-cell">
+          <input id="r_field_${i}" class="rating-input" type="number" value="${p.fielding}" min="0" max="100" />
+          <div class="mini-bar" style="background:var(--beige);width:${p.fielding}%"></div>
+        </div>
+        <button onclick="removePlayer(${i})" style="background:none;border:none;color:rgba(255,112,112,0.6);cursor:pointer;font-size:14px;padding:2px 4px">✕</button>
+      </div>`).join('')}`;
+}
+function saveRatings() {
+  players=players.map((p,i)=>({...p,
+    bat:parseInt(document.getElementById(`r_bat_${i}`)?.value)||p.bat,
+    bowl:parseInt(document.getElementById(`r_bowl_${i}`)?.value)||p.bowl,
+    fielding:parseInt(document.getElementById(`r_field_${i}`)?.value)||p.fielding,
+  }));
+  savePlayers(); renderRatings(); toast("Ratings saved!");
+}
+function resetRatings() {
+  if(!confirm("Reset all ratings?")) return;
+  players=DEFAULT_PLAYERS.map(p=>({...p})); savePlayers(); renderRatings(); toast("Reset!");
+}
+function removePlayer(idx) {
+  if(!confirm(`Remove ${players[idx].name}?`)) return;
+  const r=players.splice(idx,1)[0]; presence.delete(r.name);
+  savePlayers(); savePresence(); renderPresence(); renderRatings(); toast("Removed");
+}
+
+/* ── COMMENTS ── */
+function addComment() {
+  const author=document.getElementById("commentAuthorName").value.trim()||"Anonymous";
+  const text=document.getElementById("commentText").value.trim();
+  if(!text){toast("Write something!");return;}
+  comments.unshift({author,text,time:new Date().toISOString()});
+  saveComments(); renderComments();
+  document.getElementById("commentText").value=""; toast("Comment posted!");
+}
+function renderComments() {
+  const el=document.getElementById("commentsSection");
+  if(!el) return;
+  if(!comments.length){el.innerHTML=`<div style="color:var(--beige);font-size:12px;padding:10px 0">No comments yet — be the first!</div>`;return;}
+  el.innerHTML=comments.slice(0,30).map(c=>`
+    <div class="comment-card">
+      <div class="comment-author">${c.author}</div>
+      <div class="comment-text">${c.text}</div>
+      <div class="comment-time">${new Date(c.time).toLocaleString("en-IN",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</div>
+    </div>`).join('');
+}
+
+/* ── POSTS ── */
+let pendingPostCommentIdx = -1;
+
+function renderPostsMatchBanner() {
+  const el=document.getElementById("postsMatchBanner");
+  const latest=history[0];
+  if(!latest){el.innerHTML="";return;}
+  const today2=new Date().toISOString().slice(0,10);
+  const isToday=latest.date===today2;
+  const rc=latest.result?.includes("A Won")?"result-win":latest.result?.includes("B Won")?"result-loss":"result-draw";
+  el.innerHTML=`
+    <div class="posts-match-header">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        ${isToday?'<span class="live-badge"><span class="live-dot"></span>TODAY</span>':""}
+        <span style="font-family:var(--mono);font-size:11px;color:var(--beige)">${latest.date}</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="font-size:1.2rem;font-weight:900;color:var(--mint)">
+            ${latest.inningsA?.total||0}/${latest.inningsA?.wickets||0}
+            <span style="color:var(--beige);font-size:.85rem;font-weight:400;margin:0 8px">vs</span>
+            ${latest.inningsB?.total||0}/${latest.inningsB?.wickets||0}
+          </div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--beige);margin-top:3px">${latest.overs||"?"}ov · Team A vs Team B</div>
+        </div>
+        <span class="history-result ${rc}" style="font-size:1rem">${latest.result||"No Result"}</span>
+      </div>
+    </div>`;
+}
+
+function handlePostMedia(e) {
+  const file=e.target.files[0];
+  if(!file) return;
+  postMediaFile=file;
+  const preview=document.getElementById("mediaPreview");
+  const url=URL.createObjectURL(file);
+  if(file.type.startsWith("video/")) {
+    preview.innerHTML=`<video src="${url}" controls style="width:100%;max-height:240px;border-radius:10px"></video>`;
+  } else {
+    preview.innerHTML=`<img src="${url}" style="width:100%;max-height:240px;object-fit:cover;border-radius:10px" />`;
+  }
+  document.getElementById("uploadZone").style.display="none";
+}
+
+function openCamera() { document.getElementById("cameraInput").click(); }
+
+function populateMatchSelect() {
+  const sel=document.getElementById("postMatchSelect"); if(!sel) return;
+  const opts=[`<option value="live">🔴 Live / Current Match (${liveMatch.date||"today"})</option>`];
+  history.slice(0,20).forEach((m,i)=>{
+    const score=`${m.inningsA?.total||0}/${m.inningsA?.wickets||0} vs ${m.inningsB?.total||0}/${m.inningsB?.wickets||0}`;
+    opts.push(`<option value="hist:${i}">${m.date} · ${score} · ${m.result||"No result"}</option>`);
+  });
+  opts.push(`<option value="none">— No match —</option>`);
+  const prev=sel.value;
+  sel.innerHTML=opts.join("");
+  if(prev) sel.value=prev;
+}
+
+function getSelectedMatchSnapshot() {
+  const sel=document.getElementById("postMatchSelect");
+  const val=sel?sel.value:"live";
+  if(val==="none") return null;
+  if(val.startsWith("hist:")) {
+    const m=history[+val.slice(5)]; if(!m) return null;
+    return {
+      kind:"history", date:m.date, overs:m.overs,
+      a:{total:m.inningsA?.total||0, wkts:m.inningsA?.wickets||0},
+      b:{total:m.inningsB?.total||0, wkts:m.inningsB?.wickets||0},
+      result:m.result||"No result",
+    };
+  }
+  // live
+  const a=liveMatch.innings[0], b=liveMatch.innings[1];
+  return {
+    kind:"live", date:liveMatch.date, overs:liveMatch.overs,
+    a:{total:a.totalRuns||0, wkts:a.totalWickets||0},
+    b:{total:b.totalRuns||0, wkts:b.totalWickets||0},
+    result:"In progress",
+  };
+}
+
+async function submitPost() {
+  const author=document.getElementById("postAuthor").value.trim()||"Anonymous";
+  const caption=document.getElementById("postCaption").value.trim();
+  if(!postMediaFile&&!caption){toast("Add photo or caption!");return;}
+  
+  let mediaURL="", mediaType="";
+  if(postMediaFile) {
+    try {
+      toast("Uploading...");
+      const storRef=ref(storage,`posts/${Date.now()}_${postMediaFile.name}`);
+      await uploadBytes(storRef,postMediaFile);
+      mediaURL=await getDownloadURL(storRef);
+      mediaType=postMediaFile.type.startsWith("video/")?"video":"image";
+    } catch(e) {
+      console.warn("storage upload failed, using local dataURL:",e);
+      const reader=new FileReader();
+      reader.readAsDataURL(postMediaFile);
+      await new Promise(r=>reader.onload=r);
+      mediaURL=reader.result;
+      mediaType=postMediaFile.type.startsWith("video/")?"video":"image";
+    }
+  }
+  
+  const matchSnap=getSelectedMatchSnapshot();
+  const post={
+    id:Date.now(), author, caption, mediaURL, mediaType,
+    time:new Date().toISOString(),
+    likes:[], comments:[],
+    matchDate:liveMatch.date,
+    match:matchSnap,
+  };
+  posts.unshift(post);
+  renderPosts();
+  await savePosts();
+  document.getElementById("postCaption").value="";
+  document.getElementById("postAuthor").value="";
+  document.getElementById("mediaPreview").innerHTML="";
+  document.getElementById("uploadZone").style.display="block";
+  postMediaFile=null;
+  toast("Posted! ✅");
+}
+
+function toggleLike(postId) {
+  const post=posts.find(p=>p.id===postId);
+  if(!post) return;
+  const name=prompt("Your name (for like):")||"Anonymous";
+  if(!post.likes) post.likes=[];
+  const idx=post.likes.indexOf(name);
+  if(idx===-1) post.likes.push(name); else post.likes.splice(idx,1);
+  savePosts(); renderPosts();
+}
+
+function openPostComment(postId) {
+  pendingPostCommentIdx=postId;
+  document.getElementById("postCommentModal").classList.remove("hidden");
+}
+
+function submitPostComment() {
+  const author=document.getElementById("postCommentAuthor").value.trim()||"Anonymous";
+  const text=document.getElementById("postCommentText").value.trim();
+  if(!text){toast("Write something!");return;}
+  const post=posts.find(p=>p.id===pendingPostCommentIdx);
+  if(!post) return;
+  if(!post.comments) post.comments=[];
+  post.comments.push({author,text,time:new Date().toISOString()});
+  savePosts(); renderPosts();
+  document.getElementById("postCommentModal").classList.add("hidden");
+  document.getElementById("postCommentText").value="";
+  toast("Comment posted!");
+}
+
+function renderMatchBadgeForPost(m) {
+  if(!m) return "";
+  const liveDot = m.kind==="live" ? `<span class="live-dot" style="display:inline-block;margin-right:4px"></span>LIVE` : "📊 MATCH";
+  return `
+    <div style="margin:0 16px 10px;padding:10px 12px;background:linear-gradient(135deg,rgba(17,100,102,0.25),rgba(26,36,32,0.4));border:1px solid var(--teal);border-radius:10px">
+      <div style="font-family:var(--mono);font-size:10px;color:#ff7070;font-weight:bold;letter-spacing:.06em;margin-bottom:4px">${liveDot} · ${m.date||""}</div>
+      <div style="font-size:13px;font-weight:900;color:var(--mint)">
+        ${m.a.total}/${m.a.wkts}
+        <span style="color:var(--beige);font-size:.85em;font-weight:400;margin:0 6px">vs</span>
+        ${m.b.total}/${m.b.wkts}
+      </div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--peach);margin-top:2px">${m.result||""}</div>
+    </div>`;
+}
+
+function renderPosts() {
+  const feed=document.getElementById("postsFeed");
+  if(!feed) return;
+  if(!posts.length){feed.innerHTML=`<div style="text-align:center;color:var(--beige);padding:30px">No posts yet!</div>`;return;}
+  feed.innerHTML=posts.map(p=>`
+    <div class="post-card">
+      ${p.mediaURL&&p.mediaType==="image"?`<img src="${p.mediaURL}" class="post-media" alt="post" loading="lazy" />`:""}
+      ${p.mediaURL&&p.mediaType==="video"?`<video src="${p.mediaURL}" class="post-video" controls preload="metadata"></video>`:""}
+      <div class="post-body">
+        <div class="post-author">${p.author}</div>
+        ${p.caption?`<div class="post-caption">${p.caption}</div>`:""}
+        <div class="post-timestamp">${new Date(p.time).toLocaleString("en-IN",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</div>
+      </div>
+      ${renderMatchBadgeForPost(p.match)}
+      <div class="post-actions">
+        <button class="post-like-btn${(p.likes||[]).length>0?" liked":""}" onclick="toggleLike(${p.id})">
+          ❤️ ${(p.likes||[]).length}
+        </button>
+        <button class="post-comment-btn" onclick="openPostComment(${p.id})">
+          💬 ${(p.comments||[]).length}
+        </button>
+      </div>
+      ${(p.comments||[]).length?`
+      <div class="post-comments-section">
+        ${p.comments.map(c=>`
+          <div class="post-comment-item">
+            <span class="post-comment-author">${c.author}</span>
+            <span style="color:var(--mint)">${c.text}</span>
+          </div>`).join('')}
+      </div>`:""}
+    </div>`).join('');
+}
+
+/* ── LIVE STREAMING ── */
+// Simple peer-to-peer WebRTC stream using Firebase signaling
+let peerConn = null;
+let localStream = null;
+let isStreaming = false;
+
+async function startBroadcast() {
+  // Detect iframe (Lovable preview) — camera/mic blocked unless allow="camera"
+  let inIframe=false;
+  try { inIframe = window.self !== window.top; } catch(e) { inIframe = true; }
+  if(inIframe) {
+    toast("Open this page in a new tab to use the camera 📷");
+    setTimeout(()=>window.open(location.href, "_blank"), 800);
+    return;
+  }
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    toast("Camera not supported on this browser");
+    return;
+  }
+  if(location.protocol !== "https:" && location.hostname !== "localhost") {
+    toast("Camera needs a secure (https) connection");
+    return;
+  }
+  try {
+    localStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}, audio:true});
+    const video = document.getElementById("streamVideo");
+    video.srcObject = localStream;
+    video.style.display = "block";
+    document.getElementById("streamPlaceholder").style.display = "none";
+    document.getElementById("streamStatusBadge").style.display = "flex";
+    document.getElementById("broadcastBtn").style.display = "none";
+    document.getElementById("stopBroadcastBtn").style.display = "inline-flex";
+    isStreaming = true;
+    await setDoc(doc(db,"shared","liveStream"),{
+      active:true, startedAt:new Date().toISOString(),
+      broadcaster: "host"
+    }).catch(()=>{});
+    toast("You're LIVE! 🔴");
+  } catch(e) {
+    console.error(e);
+    const msg = e && e.name === "NotAllowedError"
+      ? "Camera blocked. Tap the lock icon → allow Camera & Mic, then retry."
+      : e && e.name === "NotFoundError"
+      ? "No camera found on this device."
+      : "Camera unavailable: " + (e?.message || e?.name || "unknown");
+    toast(msg);
+  }
+}
+
+function stopBroadcast() {
+  if(localStream) localStream.getTracks().forEach(t=>t.stop());
+  const video = document.getElementById("streamVideo");
+  video.srcObject = null;
+  video.style.display = "none";
+  document.getElementById("streamPlaceholder").style.display = "block";
+  document.getElementById("streamStatusBadge").style.display = "none";
+  document.getElementById("broadcastBtn").style.display = "inline-flex";
+  document.getElementById("stopBroadcastBtn").style.display = "none";
+  isStreaming = false;
+  setDoc(doc(db,"shared","liveStream"),{active:false}).catch(()=>{});
+  toast("Stream ended");
+}
+
+async function watchStream() {
+  // Check if there's an active stream
+  try {
+    const snap = await getDoc(doc(db,"shared","liveStream"));
+    if(!snap.exists()||!snap.data().active) {
+      toast("No active stream right now");
+      return;
+    }
+    toast("📡 Stream detected! Note: Full P2P streaming requires server infrastructure. Contact Arnab to enable.");
+  } catch(e) {
+    toast("No active stream");
+  }
+}
+
+// Check stream status on posts tab open
+try {
+  onSnapshot(doc(db,"shared","liveStream"),(snap)=>{
+    try {
+      const badge=document.getElementById("streamStatusBadge");
+      const ph=document.getElementById("streamPlaceholder");
+      if(!badge||!ph) return;
+      if(snap.exists()&&snap.data().active&&!isStreaming) {
+        badge.style.display="flex";
+        ph.textContent="🔴 Stream is LIVE — tap Watch";
+      } else if(!isStreaming) {
+        badge.style.display="none";
+        ph.textContent="No active stream";
+      }
+    } catch(e){}
+  });
+} catch(e) { console.warn('stream snapshot init failed', e); }
+
+/* ── EXPOSE GLOBALS ── */
+Object.assign(window, {
+  startApp, switchTab,
+  selectAll, selectNone, addPlayer, addPlayer2,
+  chooseSide, tossCoin, generateTeams,
+  switchLiveInnings, resetLiveInnings, saveMatchFromLive,
+  addBall, openWicketModal, cancelWicket, confirmWicket,
+  openSelModal, closeSelModal, selectBatsman, selectBowlerModal,
+  swapStrike, undoLastBall,
+  renderHistory, toggleHistory, deleteMatch,
+  renderPerformers,
+  saveRatings, resetRatings, removePlayer,
+  addComment,
+  handlePostMedia, openCamera, submitPost, toggleLike, openPostComment, submitPostComment,
+  startBroadcast, stopBroadcast, watchStream,
+  renderPostsMatchBanner, populateMatchSelect,
+});
+</script>
+</body>
+</html>
